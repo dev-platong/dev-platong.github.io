@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { act } from 'react-dom/test-utils';
-import { Player } from '../src/components/organisms/player/Player';
+import { DashPlayer } from '../src/components/organisms/player/DashPlayer';
 
 let container: HTMLElement | null = null;
 
@@ -23,7 +23,7 @@ it('can render', () => {
     throw Error('Container is missing');
   }
   act(() => {
-    ReactDOM.render(<Player src="fake_video" />, container);
+    ReactDOM.render(<DashPlayer src="fake_video" />, container);
   });
   const video: HTMLVideoElement | null | undefined = container.querySelector(
     'video'
@@ -32,4 +32,5 @@ it('can render', () => {
     throw Error('Video tag is missing');
   }
   expect(video.src).toBe('http://localhost/fake_video');
+  expect(video.hasAttribute("data-dashjs-player")).toBe(true);
 });
