@@ -7,7 +7,9 @@
     "test": "jest",
     "lint": "eslint src/**/*.tsx",
     "fmt": "prettier --write src/**/*.tsx",
-    "dev": "webpack-dev-server --hot"
+    "dev": "webpack-dev-server --hot",
+    "build": "webpack --mode=production",
+    "devb": "webpack --mode=development"
   },
   "repository": {
     "type": "git",
