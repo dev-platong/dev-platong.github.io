@@ -2,7 +2,9 @@ import React from 'react';
 import { isVideoElement } from '../../../isVideoElement';
 import { IPlayerProps } from './IPlayerProps';
 
-export const PremitivePlayer = function premitivePlayer({ src }: IPlayerProps) {
+export const PremitivePlayer: React.FC<IPlayerProps> = function premitivePlayer({
+  src
+}) {
   React.useEffect(() => {
     console.log('Hi');
     setInterval(() => {

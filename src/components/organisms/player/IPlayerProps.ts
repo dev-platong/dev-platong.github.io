@@ -1,3 +1,3 @@
 export interface IPlayerProps {
-    src: string
+  src: string;
 }
