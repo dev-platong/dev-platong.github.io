@@ -1,34 +1,36 @@
-const path = require("path");
-const HTMLWebpackPlugin = require("html-webpack-plugin");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+/* eslint-disable no-unused-vars */
+/* eslint-disable comma-dangle */
+const path = require('path');
+const HTMLWebpackPlugin = require('html-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
-const src = "./src";
-const dest = "./dest";
+const src = './src';
+const dest = './dest';
 
 module.exports = {
-  mode: "development",
-  entry: "./src/main.tsx",
+  mode: 'development',
+  entry: './src/main.tsx',
   output: {
-    filename: "bundle.js"
+    filename: 'bundle.js'
   },
-  devtool: "source-map",
+  devtool: 'source-map',
   resolve: {
-    extensions: [".tsx", ".js", ".ts"]
+    extensions: ['.tsx', '.js', '.ts']
   },
   module: {
     rules: [
       {
         test: /\.t(s|sx)$/,
-        use: [{ loader: "ts-loader" }]
+        use: [{ loader: 'ts-loader' }]
       },
       {
         test: /\.j(s|sx)$/,
         use: [
           {
-            loader: "babel-loader",
+            loader: 'babel-loader',
             query: {
-              plugins: ["transform-runtime"],
-              presets: ["es2015"]
+              plugins: ['transform-runtime'],
+              presets: ['es2015']
             }
           }
         ],
@@ -36,14 +38,14 @@ module.exports = {
       },
       {
         test: /\.css$/,
-        use: [MiniCssExtractPlugin.loader, "css-loader"]
+        use: [MiniCssExtractPlugin.loader, 'css-loader']
       },
       {
         test: /\.(mp4|webm)$/,
         use: {
-          loader: "file-loader",
+          loader: 'file-loader',
           options: {
-            name: "[name].[ext]"
+            name: '[name].[ext]'
           }
         }
       }
@@ -51,7 +53,7 @@ module.exports = {
   },
   plugins: [
     new HTMLWebpackPlugin({
-      template: path.join(__dirname, "src/index.html")
+      template: path.join(__dirname, 'src/index.html')
     }),
     new MiniCssExtractPlugin()
   ]
