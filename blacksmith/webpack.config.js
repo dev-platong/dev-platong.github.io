@@ -5,13 +5,14 @@ const HTMLWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 const src = './src';
-const dest = __dirname;
+const dest = '../..';
 
 module.exports = (env, { mode }) => {
   return {
     mode: mode ? mode : 'development',
     entry: './src/main.tsx',
     output: {
+      path: path.join(__dirname, '../dist'),
       filename: 'bundle.js'
     },
     devtool: 'source-map',
