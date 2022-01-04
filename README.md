@@ -1,6 +1,10 @@
-# create-svelte
+# dev-platong home
 
 Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte);
+
+# Recomended
+
+I'm writing codes by VSCode. If you have it, open `workspace.code-workspace`. And you can install recommended packages easily.
 
 ## Creating a project
 
