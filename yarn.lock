@@ -586,6 +586,11 @@ email-addresses@^3.0.1:
   resolved "https://registry.yarnpkg.com/email-addresses/-/email-addresses-3.1.0.tgz#cabf7e085cbdb63008a70319a74e6136188812fb"
   integrity sha512-k0/r7GrWVL32kZlGwfPNgB2Y/mMXVTq/decgLczm/j34whdaspNrZO8CnXPf1laaHxI6ptUlsnAxN+UAPw+fzg==
 
+eme-encryption-scheme-polyfill@^2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/eme-encryption-scheme-polyfill/-/eme-encryption-scheme-polyfill-2.0.3.tgz#2ca6e06480e06cceb5e50efd27943ac46c959878"
+  integrity sha512-44CNFMsqzHdKHrzWxlS7xZ8KUHn5XutBqpmCuWzNIynmAyFInHrrD3ozv/RvK9ZhgV6QY6Easx8EWAmxteNodg==
+
 emoji-regex@^8.0.0:
   version "8.0.0"
   resolved "https://registry.yarnpkg.com/emoji-regex/-/emoji-regex-8.0.0.tgz#e818fd69ce5ccfcb404594f842963bf53164cc37"
@@ -1856,6 +1861,13 @@ semver@^7.2.1, semver@^7.3.4, semver@^7.3.5:
   integrity sha512-PoeGJYh8HK4BTO/a9Tf6ZG3veo/A7ZVsYrSA6J8ny9nb3B1VrpkuN+z9OE5wfE5p6H4LchYZsegiQgbJD94ZFQ==
   dependencies:
     lru-cache "^6.0.0"
+
+shaka-player@^3.2.1:
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/shaka-player/-/shaka-player-3.2.1.tgz#bc7a3c3400eb8204c4aa2c61bc42ffa1b08b228f"
+  integrity sha512-Iq+0PWJ46TR5myT56ubnTgPFChKizr42oaju2799r44yaQVki16Enp6sCBVFYK9TobvgnKs7GFBkTkWAW31V2Q==
+  dependencies:
+    eme-encryption-scheme-polyfill "^2.0.3"
 
 shebang-command@^2.0.0:
   version "2.0.0"
