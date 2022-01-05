@@ -1,7 +1,7 @@
 import shaka from 'shaka-player';
 import { browser } from '$app/env';
 
-export default function setup(): void {
+export default function setup(playlistUrlString: string): void {
 	if (!browser) return;
 
 	shaka.polyfill.installAll();
@@ -20,13 +20,12 @@ export default function setup(): void {
 	}
 	const player = new shaka.Player(videoElement);
 	player.addEventListener('error', onErrorEvent);
-	loadThenPlay(player);
+	loadThenPlay(player, playlistUrlString);
 }
 
-async function loadThenPlay(player: shaka.Player) {
-	const manifestUrlString = 'https://storage.googleapis.com/shaka-demo-assets/angel-one/dash.mpd';
+async function loadThenPlay(player: shaka.Player, playlistUrlString: string) {
 	try {
-		await player.load(manifestUrlString);
+		await player.load(playlistUrlString);
 	} catch (e) {
 		onError(e);
 	}
