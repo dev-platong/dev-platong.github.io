@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="generator" content="Pelican" />
+        <title>ExoPlayerImplInternalの挙動を追う（生成まわり）</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="dev-platong's home Atom Feed" />
+        <meta name="description" content="ExoPlayerImplInternalの生成時 LoadControl関連 LoadControl から 巻き戻し関連の値を取得する。 ExoPlayerImplInternal.java#L248-L249 PlaybackInfo関連..." />
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">dev-platong's home</a></h1>
+                <nav><ul>
+                    <li class="active"><a href="/category/android-exoplayer.html">Android, ExoPlayer</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/exoplayerimplinternalnoju-dong-wozhui-usheng-cheng-mawari.html" rel="bookmark"
+           title="Permalink to ExoPlayerImplInternalの挙動を追う（生成まわり）">ExoPlayerImplInternalの挙動を追う（生成まわり）</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2023-02-24T00:00:00+09:00">
+                Published: 金 24 2月 2023
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/dev-platong.html">dev-platong</a>
+        </address>
+<p>In <a href="/category/android-exoplayer.html">Android, ExoPlayer</a>.</p>
+
+</footer><!-- /.post-info -->      <h2>ExoPlayerImplInternalの生成時</h2>
+<h3>LoadControl関連</h3>
+<p>LoadControl から 巻き戻し関連の値を取得する。</p>
+<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L248-L249">ExoPlayerImplInternal.java#L248-L249</a></p>
+<h3>PlaybackInfo関連</h3>
+<p>ダミーのPlaybackInfoインスタンスと、それに基づく PlaybackInfoUpdateクラスを作る。</p>
+<p>PlaybackInfoUpdateクラスは ExoPlayerImplInternal で定義されるクラス。<br>
+保持されている PlaybackInfo の情報が外部に伝わっているとは限らない（pengingされている）。<br>
+<code>void incrementPendingOperationAcks(int operationAcks)</code> が呼び出されるタイミングで pending が解除される。<br>
+<code>incrementPendingOperationAcks</code> は ExoPlayerImpl と ExoPlayerImplInternal だけで使用される。</p>
+<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L251-L252">ExoPlayerImplInternal.java#L251-L252</a></p>
+<h3>Renderer関連</h3>
+<p>Rendererの再生特性（DRMをサポートするか・トンネルモードをサポートするかなど）を配列で保持する。</p>
+<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L253-L257">ExoPlayerImplInternal.java#L253-L257</a></p>
+<h3>PlayerMessage関連</h3>
+<h4>PlayerMessageクラス</h4>
+<p><code>package com.google.android.exoplayer2</code> にある、Playerに何か挙動を引き起こすためメッセージ。スレッドが死んでいる場合に実行を中止したり、pendingしたりできる点でCommandパターンに近い。</p>
+<p>Senderインターフェースを実装するものから送出され、Targetインターフェースを持つものが受け取る。</p>
+<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/PlayerMessage.java">PlayerMessage.java</a></p>
+<h4>PendingMessageInfo</h4>
+<p>ExoPlayerImplInternal特有のクラス。PlayerMessageがどの位置で解決されたかを、<code>periodIndex</code>, <code>periodTimeUs</code>, <code>periodUid</code> で保持する。</p>
+<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L259">ExoPlayerImplInternal.java#L259</a></p>
+<h3>Timeline関連</h3>
+<p>Timeline.WindowとTimeline.Periodをそれぞれフィールドに保持する。</p>
+<p>もしTimelineに詳しくない場合はわかりやすい<a href="https://exoplayer.dev/doc/reference/com/google/android/exoplayer2/Timeline.html">com/google/android/exoplayer2/Timeline.html</a>を参照のこと。</p>
+<p>この時、</p>
+<ul>
+<li>Windowは 単一のwindow uidと空のmediaItem</li>
+<li>Periodは 広告再生ステートではない状態</li>
+</ul>
+<p>で生成される。</p>
+<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L261-L262">ExoPlayerImplInternal.java#L261-L262</a></p>
+<h3>TrackSelector関連</h3>
+<p><code>init(InvalidationListener listener, BandwidthMeter bandwidthMeter)</code> が呼ばれるが、引数をフィールドに保持するだけのため、一般的なソフトウェアにおいてはコンストラクタのような内容である。しかしExoPlayerはサブコンポーネントの振る舞いをDIよって変更できる設計であるため、コンストラクタがその旨で利用される。そのためこちらは<code>init</code>となっているのではないかと推察できる。</p>
+<p><code>InvalidationListener</code> は、以前のトラック選択で選択され利用中の <code>Track</code> を失効させるための処理を担うハンドラのリスナー。</p>
+<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L263">ExoPlayerImplInternal.java#L263</a></p>
+<h3>MediaPeriodQueueクラス</h3>
+<p>MediaPeriodを保持し、先頭のメディアが読まれるキュー。</p>
+<p><a href="https://github.com/google/ExoPlayer/blob/029a2b27cbdc27cf9d51d4a73ebeb503968849f6/library/core/src/main/java/com/google/android/exoplayer2/MediaPeriodQueue.java#L33-L37">MediaPeriodQueue.java#L33-L37</a></p>
+<p>ExoPlayerImplInternalのコンストラクタで生成される。</p>
+<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L268">ExoPlayerImplInternal.java#L268</a></p>
+<p>MediaPeriodQueueクラスのコンストラクタでPeriodとWindowを生成するが、これは ExoPlayerImplInternalのPeriod・Windowインスタンスとは別物であることに注意。</p>
+<p><a href="https://github.com/google/ExoPlayer/blob/029a2b27cbdc27cf9d51d4a73ebeb503968849f6/library/core/src/main/java/com/google/android/exoplayer2/MediaPeriodQueue.java#L90">MediaPeriodQueue.java#L90</a></p>
+<h3>スレッド関連</h3>
+<p>新しい Thread, Looper, Handler が生成され保持される。</p>
+<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L271-L276">ExoPlayerImplInternal.java#L271-L276</a></p>
+<h2>まとめ</h2>
+<p>一旦ここまでで ExoPlayerが生成された時の関連クラスは把握できた。</p>
+<ul>
+<li>保持を目的とするPlaybackInfoUpdate・PlayerMessageInfo・MediaPeriodQueueの初期化を行う。</li>
+<li>Window/Periodを生成する。</li>
+<li>TrackSelectorを初期化する。</li>
+<li>RendererCapabilitiesの取得を行う。</li>
+<li>スレッドを生成する。</li>
+</ul>
+<p>明日は低遅延周りを理解したいため、 <code>LivePlaybackSpeedControl</code> を深追いする。</p>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>links</h2>
+                        <ul>
+                            <li><a href="https://getpelican.com/">Pelican</a></li>
+                            <li><a href="https://www.python.org/">Python.org</a></li>
+                            <li><a href="https://palletsprojects.com/p/jinja/">Jinja2</a></li>
+                            <li><a href="#">You can modify those links in your config file</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+                            <li><a href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="#">You can add links in your config file</a></li>
+                            <li><a href="#">Another social link</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a href="https://www.python.org/">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>
