@@ -67,4 +67,4 @@ ExoPlayerImplからExoPlayerImplInternalに渡される引数は、SimpleExoPlay
 - ExoPlayer.Builder -> SimpleExoPlayer -> ExoPlayerImpl -> ExoPlayerInternal と生成される。
 - SimpleExoPlayerのコンストラクタの時点で生成し、引数としてコンストラクタに渡されたクラスの実際の操作をExoPlayerImplInternalが責務として持つ。
 
-明日はExoPlayerImplInternalの振る舞いを掘り下げていく。
+明日は[ExoPlayerImplInternalの生成時の振る舞いを掘り下げていく。](./exoplayer_detail_of_exoplayerimplinternal.md)
