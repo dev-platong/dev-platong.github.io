@@ -4,22 +4,28 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="generator" content="Pelican" />
-        <title>dev-platong's home - dev-platong</title>
+        <title>Low Latency時に快適な再生：LivePlaybackSpeedControlの挙動を追う</title>
         <link rel="stylesheet" href="/theme/css/main.css" />
         <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="dev-platong's home Atom Feed" />
+        <meta name="description" content="Live再生時にMediaに設定される LiveConfigurationクラス オフセットと再生速度のmin/maxが設定できる。オフセットに関してはターゲット …" />
 </head>
 
 <body id="index" class="home">
         <header id="banner" class="body">
                 <h1><a href="/">dev-platong's home</a></h1>
                 <nav><ul>
-                    <li><a href="/category/android-exoplayer.html">Android, ExoPlayer</a></li>
+                    <li class="active"><a href="/category/android-exoplayer.html">Android, ExoPlayer</a></li>
                 </ul></nav>
         </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/low-latencyshi-nikuai-shi-nazai-sheng-liveplaybackspeedcontrolnoju-dong-wozhui-u.html" rel="bookmark"
+           title="Permalink to Low Latency時に快適な再生：LivePlaybackSpeedControlの挙動を追う">Low Latency時に快適な再生：LivePlaybackSpeedControlの挙動を追う</a></h1>
+    </header>
 
-            <aside id="featured" class="body">
-                <article>
-                    <h1 class="entry-title"><a href="/low-latencyshi-nikuai-shi-nazai-sheng-liveplaybackspeedcontrolnoju-dong-wozhui-u.html">Low Latency時に快適な再生：LivePlaybackSpeedControlの挙動を追う</a></h1>
+    <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2023-02-25T00:00:00+09:00">
                 Published: 土 25 2月 2023
@@ -30,7 +36,7 @@
         </address>
 <p>In <a href="/category/android-exoplayer.html">Android, ExoPlayer</a>.</p>
 
-</footer><!-- /.post-info --><h2>Live再生時にMediaに設定される LiveConfigurationクラス</h2>
+</footer><!-- /.post-info -->      <h2>Live再生時にMediaに設定される LiveConfigurationクラス</h2>
 <p>オフセットと再生速度のmin/maxが設定できる。オフセットに関してはターゲットも設定できる。</p>
 <h2>LivePlaybackSpeedControlインターフェース</h2>
 <p>ターゲットオフセットは、 <code>LivePlaybackSpeedControl</code> から上書きできる。</p>
@@ -58,87 +64,11 @@
 <li>ターゲットオフセットは内部の振る舞いにより変更される。</li>
 <li>DefaultLivePlaybackSpeedControlでは比例制御が行われる。</li>
 </ul>
-<p>明日はより詳細にアルゴリズムを追います。</p>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+<p>明日はより詳細にアルゴリズムを追います。</p>
+    </div><!-- /.entry-content -->
 
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/dev-platongs-home.html" rel="bookmark"
-                           title="Permalink to dev-platong's home">dev-platong's home</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2023-02-24T00:00:00+09:00">
-                Published: 金 24 2月 2023
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/dev-platong.html">dev-platong</a>
-        </address>
-<p>In <a href="/category/android-exoplayer.html">Android, ExoPlayer</a>.</p>
-
-</footer><!-- /.post-info -->                <p>Hello world.</p>
-                <a class="readmore" href="/dev-platongs-home.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/exoplayerimplinternalnoju-dong-wozhui-usheng-cheng-mawari.html" rel="bookmark"
-                           title="Permalink to ExoPlayerImplInternalの挙動を追う（生成まわり）">ExoPlayerImplInternalの挙動を追う（生成まわり）</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2023-02-24T00:00:00+09:00">
-                Published: 金 24 2月 2023
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/dev-platong.html">dev-platong</a>
-        </address>
-<p>In <a href="/category/android-exoplayer.html">Android, ExoPlayer</a>.</p>
-
-</footer><!-- /.post-info -->                <h2>ExoPlayerImplInternalの生成時</h2>
-<h3>LoadControl関連</h3>
-<p>LoadControl から 巻き戻し関連の値を取得する。</p>
-<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L248-L249">ExoPlayerImplInternal.java#L248-L249</a></p>
-<h3>PlaybackInfo関連</h3>
-<p>ダミーのPlaybackInfoインスタンスと、それに基づく PlaybackInfoUpdateク …</p>
-                <a class="readmore" href="/exoplayerimplinternalnoju-dong-wozhui-usheng-cheng-mawari.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/exoplayergasheng-cheng-sarerushi-ju-ti-de-nihadonnakurasugasheng-cheng-sarerunoka.html" rel="bookmark"
-                           title="Permalink to ExoPlayerが生成される時、具体的にはどんなクラスが生成されるのか">ExoPlayerが生成される時、具体的にはどんなクラスが生成されるのか</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2023-02-23T00:00:00+09:00">
-                Published: 木 23 2月 2023
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/dev-platong.html">dev-platong</a>
-        </address>
-<p>In <a href="/category/android-exoplayer.html">Android, ExoPlayer</a>.</p>
-
-</footer><!-- /.post-info -->                <h2>概要</h2>
-<p>ExoPlayerでの再生問題におけるトラブルシューティング迅速化のため、再生に関わるクラスを把握する。<br>
-今回はDefault実装 …</p>
-                <a class="readmore" href="/exoplayergasheng-cheng-sarerushi-ju-ti-de-nihadonnakurasugasheng-cheng-sarerunoka.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-                </ol><!-- /#posts-list -->
-                </section><!-- /#content -->
+  </article>
+</section>
         <section id="extras" class="body">
                 <div class="blogroll">
                         <h2>links</h2>
