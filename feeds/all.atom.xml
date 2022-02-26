@@ -1,5 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom"><title>dev-platong's home</title><link href="/" rel="alternate"></link><link href="/feeds/all.atom.xml" rel="self"></link><id>/</id><updated>2023-02-25T00:00:00+09:00</updated><entry><title>Low Latency時に快適な再生：LivePlaybackSpeedControlの挙動を追う</title><link href="/low-latencyshi-nikuai-shi-nazai-sheng-liveplaybackspeedcontrolnoju-dong-wozhui-u.html" rel="alternate"></link><published>2023-02-25T00:00:00+09:00</published><updated>2023-02-25T00:00:00+09:00</updated><author><name>dev-platong</name></author><id>tag:None,2023-02-25:/low-latencyshi-nikuai-shi-nazai-sheng-liveplaybackspeedcontrolnoju-dong-wozhui-u.html</id><summary type="html">&lt;h2&gt;Live再生時にMediaに設定される LiveConfigurationクラス&lt;/h2&gt;
+<feed xmlns="http://www.w3.org/2005/Atom"><title>dev-platong's home</title><link href="/" rel="alternate"></link><link href="/feeds/all.atom.xml" rel="self"></link><id>/</id><updated>2023-02-26T00:00:00+09:00</updated><entry><title>LivePlaybackSpeedControlの詳細（アルゴリズム）</title><link href="/liveplaybackspeedcontrolnoxiang-xi-arugorizumu.html" rel="alternate"></link><published>2023-02-26T00:00:00+09:00</published><updated>2023-02-26T00:00:00+09:00</updated><author><name>dev-platong</name></author><id>tag:None,2023-02-26:/liveplaybackspeedcontrolnoxiang-xi-arugorizumu.html</id><summary type="html">&lt;h2&gt;maybeXXXに&lt;/h2&gt;
+&lt;p&gt;ExoPlayerには &lt;code&gt;maybeXXX()&lt;/code&gt; というメソッドが多々ある。&lt;br&gt;
+何かしらの副作用を引き起こす可能性があるメソッドであり、読むときは条 …&lt;/p&gt;</summary><content type="html">&lt;h2&gt;maybeXXXに&lt;/h2&gt;
+&lt;p&gt;ExoPlayerには &lt;code&gt;maybeXXX()&lt;/code&gt; というメソッドが多々ある。&lt;br&gt;
+何かしらの副作用を引き起こす可能性があるメソッドであり、読むときは条件に注目して読むことになる。&lt;/p&gt;
+&lt;h2&gt;TargetLiveOffsetのリセット&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;maybeResetTargetLiveOffset()&lt;/code&gt; が &lt;code&gt;LiveConfiguration&lt;/code&gt; が更新されるか、&lt;code&gt;targetLiveOffset&lt;/code&gt; が更新される場合に呼ばれます。&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://github.com/google/ExoPlayer/blob/release-v2/library/core/src/main/java/com/google/android/exoplayer2/DefaultLivePlaybackSpeedControl.java#L299-L322"&gt;DefaultLivePlaybackSpeedControl.java#L299-L322&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;targetLiveOffsetOverrideUs&lt;/code&gt; があれば、これを &lt;code&gt;idealTargetLiveOffset&lt;/code&gt; と &lt;code&gt;currentTargetLiveOffset&lt;/code&gt; に設定する。
+ ない場合には LiveConfiguration経由のtargetOffset （ &lt;code&gt;mediaConfigurationTargetLiveOffsetUs&lt;/code&gt; ） を設定する。&lt;/p&gt;
+&lt;p&gt;すでに &lt;code&gt;idealTargetLiveOffset&lt;/code&gt; が &lt;code&gt;idealOffsetUs&lt;/code&gt; と同じ秒数だった場合にはアーリーリターンする。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;smoothedMinPossibleLiveOffsetUs&lt;/li&gt;
+&lt;li&gt;smoothedMinPossibleLiveOffsetDeviationUs&lt;/li&gt;
+&lt;li&gt;lastPlaybackSpeedUpdateMs&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;がリセットされる。&lt;/p&gt;
+&lt;h2&gt;リバッファリングが起きた時、&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;targetLiveOffsetRebufferDeltaUs&lt;/code&gt; 　の分だけ &lt;code&gt;currentTargetLiveOffsetUs&lt;/code&gt; を増やし、 &lt;code&gt;lastPlaybackSpeedUpdateMs&lt;/code&gt; をアンセットします。&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/DefaultLivePlaybackSpeedControl.java#L321"&gt;DefaultLivePlaybackSpeedControl.java#L321&lt;/a&gt;&lt;/p&gt;
+&lt;h2&gt;平滑化（線形）&lt;/h2&gt;
+&lt;p&gt;引数として渡された2つの値を、&lt;code&gt;smoothingFactor&lt;/code&gt; の割合で足し合わせます。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nv"&gt;private&lt;/span&gt; &lt;span class="nv"&gt;static&lt;/span&gt; &lt;span class="nv"&gt;long&lt;/span&gt; &lt;span class="nv"&gt;smooth&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;long&lt;/span&gt; &lt;span class="nv"&gt;smoothedValue&lt;/span&gt;, &lt;span class="nv"&gt;long&lt;/span&gt; &lt;span class="nv"&gt;newValue&lt;/span&gt;, &lt;span class="nv"&gt;float&lt;/span&gt; &lt;span class="nv"&gt;smoothingFactor&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt; {
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;long&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt; &lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;smoothingFactor&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="nv"&gt;smoothedValue&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="nv"&gt;f&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="nv"&gt;smoothingFactor&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="nv"&gt;newValue&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;&lt;span class="c1"&gt;;&lt;/span&gt;
+  }
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/DefaultLivePlaybackSpeedControl.java#L443-L445"&gt;DefaultLivePlaybackSpeedControl.java#L443-L445&lt;/a&gt;&lt;/p&gt;
+&lt;h2&gt;SmoothedMinPossibleLiveOffsetUs のアップデート&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;liveOffsetUs&lt;/code&gt; と &lt;code&gt;bufferedDurationUs&lt;/code&gt; の差をとり &lt;code&gt;minPossibleLiveOffsetUs&lt;/code&gt; とします。仮に &lt;code&gt;liveOffset&lt;/code&gt; が 8us、 &lt;code&gt;bugfferedDurationUs&lt;/code&gt; が 5us の場合、 &lt;code&gt;minPossibleLiveOffsetUs&lt;/code&gt; は 3us となります。&lt;/p&gt;
+&lt;p&gt;その後、  &lt;code&gt;minPossibleLiveOffsetUs&lt;/code&gt; そのままのものと、 &lt;code&gt;minPossibleLiveOffsetUs&lt;/code&gt; と &lt;code&gt;smoothedMinPossibleLiveOffsetUs&lt;/code&gt; で 平滑化したものを比較し大きい方を &lt;code&gt;smoothedMinPossibleLiveOffsetUs&lt;/code&gt; とします。これは安全で可能な値のうち、トラックをより良い値に保持すべきだからです。&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/DefaultLivePlaybackSpeedControl.java#L394-L402"&gt;DefaultLivePlaybackSpeedControl.java#L394-L402&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;minPossibleLiveOffsetDeviationUs&lt;/code&gt; は &lt;code&gt;minPossibleLiveOffsetUs&lt;/code&gt; と &lt;code&gt;smoothedMinPossibleLiveOffsetUs&lt;/code&gt; の差です。（&lt;code&gt;minPossibleLiveOffsetUs&lt;/code&gt; が採択された場合この値は0になります。）&lt;/p&gt;
+&lt;h2&gt;TargetLiveOffsetの調整&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;safeOffsetUs&lt;/code&gt; を minPossibleLiveOffsetDeviationUs を &lt;code&gt;smoothedMinPossibleLiveOffsetUs + 3 * smoothedMinPossibleLiveOffsetDeviationUs;&lt;/code&gt; と定義します。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;currentTargetLiveOffsetUs&lt;/code&gt; の値を &lt;code&gt;safeOffsetUs&lt;/code&gt; に近づけていきます。&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/DefaultLivePlaybackSpeedControl.java#L413"&gt;DefaultLivePlaybackSpeedControl.java#L413&lt;/a&gt;&lt;/p&gt;
+&lt;h2&gt;調整後のスピードの取得&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;mediaConfigurationTargetLiveOffsetUs&lt;/code&gt; が TIME_UNSET の場合は常に1です。（狙うOffsetがないため）&lt;/p&gt;
+&lt;p&gt;引数として渡された &lt;code&gt;liveOffset&lt;/code&gt; で &lt;code&gt;currentTargetLiveOffset&lt;/code&gt; の値を変化させたのちに、その差をとります。（currentTargetLiveOffsetはsafeOffsetに寄っているため値に差が出ます。）&lt;/p&gt;
+&lt;p&gt;この値が速度を変化させるべき値となるため、その値にFactorをかけて速度を調整します。&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/DefaultLivePlaybackSpeedControl.java#L334"&gt;DefaultLivePlaybackSpeedControl.java#L334&lt;/a&gt;&lt;/p&gt;
+&lt;h2&gt;まとめ&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;線形平滑化を利用する。（前回の値を考慮する）&lt;/li&gt;
+&lt;li&gt;前回の値を考慮しながらtargetOffsetを調整している。&lt;/li&gt;
+&lt;li&gt;速度の調整は、渡されたTargetOffsetからcurrentTargetOffsetの値を前回の値を考慮しつつ変化させ、差を取って決定する。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;明日はExoPlayerでMediaが再生されるまでの追っかけに戻ります。&lt;/p&gt;</content><category term="Android, ExoPlayer"></category></entry><entry><title>Low Latency時に快適な再生：LivePlaybackSpeedControlの挙動を追う</title><link href="/low-latencyshi-nikuai-shi-nazai-sheng-liveplaybackspeedcontrolnoju-dong-wozhui-u.html" rel="alternate"></link><published>2023-02-25T00:00:00+09:00</published><updated>2023-02-25T00:00:00+09:00</updated><author><name>dev-platong</name></author><id>tag:None,2023-02-25:/low-latencyshi-nikuai-shi-nazai-sheng-liveplaybackspeedcontrolnoju-dong-wozhui-u.html</id><summary type="html">&lt;h2&gt;Live再生時にMediaに設定される LiveConfigurationクラス&lt;/h2&gt;
 &lt;p&gt;オフセットと再生速度のmin/maxが設定できる。オフセットに関してはターゲット …&lt;/p&gt;</summary><content type="html">&lt;h2&gt;Live再生時にMediaに設定される LiveConfigurationクラス&lt;/h2&gt;
 &lt;p&gt;オフセットと再生速度のmin/maxが設定できる。オフセットに関してはターゲットも設定できる。&lt;/p&gt;
 &lt;h2&gt;LivePlaybackSpeedControlインターフェース&lt;/h2&gt;
@@ -28,7 +76,7 @@
 &lt;li&gt;ターゲットオフセットは内部の振る舞いにより変更される。&lt;/li&gt;
 &lt;li&gt;DefaultLivePlaybackSpeedControlでは比例制御が行われる。&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;明日はより詳細にアルゴリズムを追います。&lt;/p&gt;</content><category term="Android, ExoPlayer"></category></entry><entry><title>dev-platong's home</title><link href="/dev-platongs-home.html" rel="alternate"></link><published>2023-02-24T00:00:00+09:00</published><updated>2023-02-24T00:00:00+09:00</updated><author><name>dev-platong</name></author><id>tag:None,2023-02-24:/dev-platongs-home.html</id><content type="html">&lt;p&gt;Hello world.&lt;/p&gt;</content><category term="Android, ExoPlayer"></category></entry><entry><title>ExoPlayerImplInternalの挙動を追う（生成まわり）</title><link href="/exoplayerimplinternalnoju-dong-wozhui-usheng-cheng-mawari.html" rel="alternate"></link><published>2023-02-24T00:00:00+09:00</published><updated>2023-02-24T00:00:00+09:00</updated><author><name>dev-platong</name></author><id>tag:None,2023-02-24:/exoplayerimplinternalnoju-dong-wozhui-usheng-cheng-mawari.html</id><summary type="html">&lt;h2&gt;ExoPlayerImplInternalの生成時&lt;/h2&gt;
+&lt;p&gt;明日はより詳細に&lt;a href="./exoplayer_detail_of_liveplaybackspeedcontrol.md"&gt;アルゴリズムを追います。&lt;/a&gt;&lt;/p&gt;</content><category term="Android, ExoPlayer"></category></entry><entry><title>ExoPlayerImplInternalの挙動を追う（生成まわり）</title><link href="/exoplayerimplinternalnoju-dong-wozhui-usheng-cheng-mawari.html" rel="alternate"></link><published>2023-02-24T00:00:00+09:00</published><updated>2023-02-24T00:00:00+09:00</updated><author><name>dev-platong</name></author><id>tag:None,2023-02-24:/exoplayerimplinternalnoju-dong-wozhui-usheng-cheng-mawari.html</id><summary type="html">&lt;h2&gt;ExoPlayerImplInternalの生成時&lt;/h2&gt;
 &lt;h3&gt;LoadControl関連&lt;/h3&gt;
 &lt;p&gt;LoadControl から 巻き戻し関連の値を取得する。&lt;/p&gt;
 &lt;p&gt;&lt;a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L248-L249"&gt;ExoPlayerImplInternal.java#L248-L249&lt;/a&gt;&lt;/p&gt;

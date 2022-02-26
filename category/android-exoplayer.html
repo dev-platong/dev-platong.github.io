@@ -13,13 +13,84 @@
         <header id="banner" class="body">
                 <h1><a href="/">dev-platong's home</a></h1>
                 <nav><ul>
+                    <li><a href="/pages/dev-platongs-home.html">dev-platong's home</a></li>
                     <li class="active"><a href="/category/android-exoplayer.html">Android, ExoPlayer</a></li>
                 </ul></nav>
         </header><!-- /#banner -->
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/low-latencyshi-nikuai-shi-nazai-sheng-liveplaybackspeedcontrolnoju-dong-wozhui-u.html">Low Latency時に快適な再生：LivePlaybackSpeedControlの挙動を追う</a></h1>
+                    <h1 class="entry-title"><a href="/liveplaybackspeedcontrolnoxiang-xi-arugorizumu.html">LivePlaybackSpeedControlの詳細（アルゴリズム）</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2023-02-26T00:00:00+09:00">
+                Published: 日 26 2月 2023
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/dev-platong.html">dev-platong</a>
+        </address>
+<p>In <a href="/category/android-exoplayer.html">Android, ExoPlayer</a>.</p>
+
+</footer><!-- /.post-info --><h2>maybeXXXに</h2>
+<p>ExoPlayerには <code>maybeXXX()</code> というメソッドが多々ある。<br>
+何かしらの副作用を引き起こす可能性があるメソッドであり、読むときは条件に注目して読むことになる。</p>
+<h2>TargetLiveOffsetのリセット</h2>
+<p><code>maybeResetTargetLiveOffset()</code> が <code>LiveConfiguration</code> が更新されるか、<code>targetLiveOffset</code> が更新される場合に呼ばれます。</p>
+<p><a href="https://github.com/google/ExoPlayer/blob/release-v2/library/core/src/main/java/com/google/android/exoplayer2/DefaultLivePlaybackSpeedControl.java#L299-L322">DefaultLivePlaybackSpeedControl.java#L299-L322</a></p>
+<p><code>targetLiveOffsetOverrideUs</code> があれば、これを <code>idealTargetLiveOffset</code> と <code>currentTargetLiveOffset</code> に設定する。
+ ない場合には LiveConfiguration経由のtargetOffset （ <code>mediaConfigurationTargetLiveOffsetUs</code> ） を設定する。</p>
+<p>すでに <code>idealTargetLiveOffset</code> が <code>idealOffsetUs</code> と同じ秒数だった場合にはアーリーリターンする。</p>
+<ul>
+<li>smoothedMinPossibleLiveOffsetUs</li>
+<li>smoothedMinPossibleLiveOffsetDeviationUs</li>
+<li>lastPlaybackSpeedUpdateMs</li>
+</ul>
+<p>がリセットされる。</p>
+<h2>リバッファリングが起きた時、</h2>
+<p><code>targetLiveOffsetRebufferDeltaUs</code> 　の分だけ <code>currentTargetLiveOffsetUs</code> を増やし、 <code>lastPlaybackSpeedUpdateMs</code> をアンセットします。</p>
+<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/DefaultLivePlaybackSpeedControl.java#L321">DefaultLivePlaybackSpeedControl.java#L321</a></p>
+<h2>平滑化（線形）</h2>
+<p>引数として渡された2つの値を、<code>smoothingFactor</code> の割合で足し合わせます。</p>
+<div class="highlight"><pre><span></span><code><span class="nv">private</span> <span class="nv">static</span> <span class="nv">long</span> <span class="nv">smooth</span><span class="ss">(</span><span class="nv">long</span> <span class="nv">smoothedValue</span>, <span class="nv">long</span> <span class="nv">newValue</span>, <span class="nv">float</span> <span class="nv">smoothingFactor</span><span class="ss">)</span> {
+    <span class="k">return</span> <span class="ss">(</span><span class="nv">long</span><span class="ss">)</span> <span class="ss">(</span><span class="nv">smoothingFactor</span> <span class="o">*</span> <span class="nv">smoothedValue</span> <span class="o">+</span> <span class="ss">(</span><span class="mi">1</span><span class="nv">f</span> <span class="o">-</span> <span class="nv">smoothingFactor</span><span class="ss">)</span> <span class="o">*</span> <span class="nv">newValue</span><span class="ss">)</span><span class="c1">;</span>
+  }
+</code></pre></div>
+
+<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/DefaultLivePlaybackSpeedControl.java#L443-L445">DefaultLivePlaybackSpeedControl.java#L443-L445</a></p>
+<h2>SmoothedMinPossibleLiveOffsetUs のアップデート</h2>
+<p><code>liveOffsetUs</code> と <code>bufferedDurationUs</code> の差をとり <code>minPossibleLiveOffsetUs</code> とします。仮に <code>liveOffset</code> が 8us、 <code>bugfferedDurationUs</code> が 5us の場合、 <code>minPossibleLiveOffsetUs</code> は 3us となります。</p>
+<p>その後、  <code>minPossibleLiveOffsetUs</code> そのままのものと、 <code>minPossibleLiveOffsetUs</code> と <code>smoothedMinPossibleLiveOffsetUs</code> で 平滑化したものを比較し大きい方を <code>smoothedMinPossibleLiveOffsetUs</code> とします。これは安全で可能な値のうち、トラックをより良い値に保持すべきだからです。</p>
+<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/DefaultLivePlaybackSpeedControl.java#L394-L402">DefaultLivePlaybackSpeedControl.java#L394-L402</a></p>
+<p><code>minPossibleLiveOffsetDeviationUs</code> は <code>minPossibleLiveOffsetUs</code> と <code>smoothedMinPossibleLiveOffsetUs</code> の差です。（<code>minPossibleLiveOffsetUs</code> が採択された場合この値は0になります。）</p>
+<h2>TargetLiveOffsetの調整</h2>
+<p><code>safeOffsetUs</code> を minPossibleLiveOffsetDeviationUs を <code>smoothedMinPossibleLiveOffsetUs + 3 * smoothedMinPossibleLiveOffsetDeviationUs;</code> と定義します。</p>
+<p><code>currentTargetLiveOffsetUs</code> の値を <code>safeOffsetUs</code> に近づけていきます。</p>
+<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/DefaultLivePlaybackSpeedControl.java#L413">DefaultLivePlaybackSpeedControl.java#L413</a></p>
+<h2>調整後のスピードの取得</h2>
+<p><code>mediaConfigurationTargetLiveOffsetUs</code> が TIME_UNSET の場合は常に1です。（狙うOffsetがないため）</p>
+<p>引数として渡された <code>liveOffset</code> で <code>currentTargetLiveOffset</code> の値を変化させたのちに、その差をとります。（currentTargetLiveOffsetはsafeOffsetに寄っているため値に差が出ます。）</p>
+<p>この値が速度を変化させるべき値となるため、その値にFactorをかけて速度を調整します。</p>
+<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/DefaultLivePlaybackSpeedControl.java#L334">DefaultLivePlaybackSpeedControl.java#L334</a></p>
+<h2>まとめ</h2>
+<ul>
+<li>線形平滑化を利用する。（前回の値を考慮する）</li>
+<li>前回の値を考慮しながらtargetOffsetを調整している。</li>
+<li>速度の調整は、渡されたTargetOffsetからcurrentTargetOffsetの値を前回の値を考慮しつつ変化させ、差を取って決定する。</li>
+</ul>
+<p>明日はExoPlayerでMediaが再生されるまでの追っかけに戻ります。</p>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/low-latencyshi-nikuai-shi-nazai-sheng-liveplaybackspeedcontrolnoju-dong-wozhui-u.html" rel="bookmark"
+                           title="Permalink to Low Latency時に快適な再生：LivePlaybackSpeedControlの挙動を追う">Low Latency時に快適な再生：LivePlaybackSpeedControlの挙動を追う</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2023-02-25T00:00:00+09:00">
                 Published: 土 25 2月 2023
@@ -30,60 +101,9 @@
         </address>
 <p>In <a href="/category/android-exoplayer.html">Android, ExoPlayer</a>.</p>
 
-</footer><!-- /.post-info --><h2>Live再生時にMediaに設定される LiveConfigurationクラス</h2>
-<p>オフセットと再生速度のmin/maxが設定できる。オフセットに関してはターゲットも設定できる。</p>
-<h2>LivePlaybackSpeedControlインターフェース</h2>
-<p>ターゲットオフセットは、 <code>LivePlaybackSpeedControl</code> から上書きできる。</p>
-<p><a href="https://github.com/google/ExoPlayer/blob/release-v2/library/core/src/main/java/com/google/android/exoplayer2/LivePlaybackSpeedControl.java#L41">LivePlaybackSpeedControl.java#L41</a></p>
-<p>ユーザーインタラクションではないリバッファリングの検知も行う。</p>
-<p><a href="https://github.com/google/ExoPlayer/blob/release-v2/library/core/src/main/java/com/google/android/exoplayer2/LivePlaybackSpeedControl.java#L50">LivePlaybackSpeedControl.java#L50</a></p>
-<p>現在のオフセット位置とバッファ位置を渡すことで、調整のための速度を返すメソッドがある。</p>
-<p><a href="https://github.com/google/ExoPlayer/blob/release-v2/library/core/src/main/java/com/google/android/exoplayer2/LivePlaybackSpeedControl.java#L60">LivePlaybackSpeedControl.java#L60</a></p>
-<p>現在のターゲットオフセットは外部からも取得可能（隠蔽したい意図はないらしい、内部的に変更されることがあるのか？）</p>
-<p><a href="https://github.com/google/ExoPlayer/blob/release-v2/library/core/src/main/java/com/google/android/exoplayer2/LivePlaybackSpeedControl.java#L66">LivePlaybackSpeedControl.java#L66</a></p>
-<h2>DefaultLivePlaybackSpeedControl</h2>
-<p>速度のコントロールメカニズムは比例制御を利用する。 <code>1.0 + 比例制御定数 * （ 現在のライブオフセット秒数 - ターゲットライブオフセット秒数 ）</code> で表される。</p>
-<p>比例制御定数はデフォルトで <code>0.1</code>。</p>
-<p>リバッファリングが起きた時、</p>
-<p><code>Builder#setTargetLiveOffsetIncrementOnRebufferMs(long targetLiveOffsetIncrementOnRebufferMs)</code> の分だけ、target offsetが増加し、ネットワークケイパビリティが縮小する。</p>
-<p>状況が改善すると、</p>
-<p><code>Builder#setMinPossibleLiveOffsetSmoothingFactor(float minPossibleLiveOffsetSmoothingFactor)</code> の分だけ、target offsetが縮小する。注意するのは秒数をしているするのではなく、ファクターであると。</p>
-<p><a href="https://github.com/google/ExoPlayer/blob/release-v2/library/core/src/main/java/com/google/android/exoplayer2/DefaultLivePlaybackSpeedControl.java#L31">DefaultLivePlaybackSpeedControl.java#L31</a></p>
-<p>デフォルトの速度はMin 0.97 / Max 1.03 倍で設定されている。<br>
-速度アップデートの感覚はデフォルトで1秒おき。</p>
-<p>リバッファリングが起きた時に、ライブオフセットの秒数はデフォルトで0.5秒増える。</p>
-<h2>まとめ</h2>
-<ul>
-<li>LivePlaybackSpeedControlでは、ターゲットオフセットに狙って速度を変更する。</li>
-<li>ターゲットオフセットは内部の振る舞いにより変更される。</li>
-<li>DefaultLivePlaybackSpeedControlでは比例制御が行われる。</li>
-</ul>
-<p>明日はより詳細にアルゴリズムを追います。</p>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/dev-platongs-home.html" rel="bookmark"
-                           title="Permalink to dev-platong's home">dev-platong's home</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2023-02-24T00:00:00+09:00">
-                Published: 金 24 2月 2023
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/dev-platong.html">dev-platong</a>
-        </address>
-<p>In <a href="/category/android-exoplayer.html">Android, ExoPlayer</a>.</p>
-
-</footer><!-- /.post-info -->                <p>Hello world.</p>
-                <a class="readmore" href="/dev-platongs-home.html">read more</a>
+</footer><!-- /.post-info -->                <h2>Live再生時にMediaに設定される LiveConfigurationクラス</h2>
+<p>オフセットと再生速度のmin/maxが設定できる。オフセットに関してはターゲット …</p>
+                <a class="readmore" href="/low-latencyshi-nikuai-shi-nazai-sheng-liveplaybackspeedcontrolnoju-dong-wozhui-u.html">read more</a>
                 </div><!-- /.entry-content -->
             </article></li>
 

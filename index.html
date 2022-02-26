@@ -13,132 +13,15 @@
         <header id="banner" class="body">
                 <h1><a href="/">dev-platong's home</a></h1>
                 <nav><ul>
+                    <li class="active"><a href="/pages/dev-platongs-home.html">dev-platong's home</a></li>
                     <li><a href="/category/android-exoplayer.html">Android, ExoPlayer</a></li>
                 </ul></nav>
         </header><!-- /#banner -->
-
-            <aside id="featured" class="body">
-                <article>
-                    <h1 class="entry-title"><a href="/low-latencyshi-nikuai-shi-nazai-sheng-liveplaybackspeedcontrolnoju-dong-wozhui-u.html">Low Latency時に快適な再生：LivePlaybackSpeedControlの挙動を追う</a></h1>
-<footer class="post-info">
-        <abbr class="published" title="2023-02-25T00:00:00+09:00">
-                Published: 土 25 2月 2023
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/dev-platong.html">dev-platong</a>
-        </address>
-<p>In <a href="/category/android-exoplayer.html">Android, ExoPlayer</a>.</p>
-
-</footer><!-- /.post-info --><h2>Live再生時にMediaに設定される LiveConfigurationクラス</h2>
-<p>オフセットと再生速度のmin/maxが設定できる。オフセットに関してはターゲットも設定できる。</p>
-<h2>LivePlaybackSpeedControlインターフェース</h2>
-<p>ターゲットオフセットは、 <code>LivePlaybackSpeedControl</code> から上書きできる。</p>
-<p><a href="https://github.com/google/ExoPlayer/blob/release-v2/library/core/src/main/java/com/google/android/exoplayer2/LivePlaybackSpeedControl.java#L41">LivePlaybackSpeedControl.java#L41</a></p>
-<p>ユーザーインタラクションではないリバッファリングの検知も行う。</p>
-<p><a href="https://github.com/google/ExoPlayer/blob/release-v2/library/core/src/main/java/com/google/android/exoplayer2/LivePlaybackSpeedControl.java#L50">LivePlaybackSpeedControl.java#L50</a></p>
-<p>現在のオフセット位置とバッファ位置を渡すことで、調整のための速度を返すメソッドがある。</p>
-<p><a href="https://github.com/google/ExoPlayer/blob/release-v2/library/core/src/main/java/com/google/android/exoplayer2/LivePlaybackSpeedControl.java#L60">LivePlaybackSpeedControl.java#L60</a></p>
-<p>現在のターゲットオフセットは外部からも取得可能（隠蔽したい意図はないらしい、内部的に変更されることがあるのか？）</p>
-<p><a href="https://github.com/google/ExoPlayer/blob/release-v2/library/core/src/main/java/com/google/android/exoplayer2/LivePlaybackSpeedControl.java#L66">LivePlaybackSpeedControl.java#L66</a></p>
-<h2>DefaultLivePlaybackSpeedControl</h2>
-<p>速度のコントロールメカニズムは比例制御を利用する。 <code>1.0 + 比例制御定数 * （ 現在のライブオフセット秒数 - ターゲットライブオフセット秒数 ）</code> で表される。</p>
-<p>比例制御定数はデフォルトで <code>0.1</code>。</p>
-<p>リバッファリングが起きた時、</p>
-<p><code>Builder#setTargetLiveOffsetIncrementOnRebufferMs(long targetLiveOffsetIncrementOnRebufferMs)</code> の分だけ、target offsetが増加し、ネットワークケイパビリティが縮小する。</p>
-<p>状況が改善すると、</p>
-<p><code>Builder#setMinPossibleLiveOffsetSmoothingFactor(float minPossibleLiveOffsetSmoothingFactor)</code> の分だけ、target offsetが縮小する。注意するのは秒数をしているするのではなく、ファクターであると。</p>
-<p><a href="https://github.com/google/ExoPlayer/blob/release-v2/library/core/src/main/java/com/google/android/exoplayer2/DefaultLivePlaybackSpeedControl.java#L31">DefaultLivePlaybackSpeedControl.java#L31</a></p>
-<p>デフォルトの速度はMin 0.97 / Max 1.03 倍で設定されている。<br>
-速度アップデートの感覚はデフォルトで1秒おき。</p>
-<p>リバッファリングが起きた時に、ライブオフセットの秒数はデフォルトで0.5秒増える。</p>
-<h2>まとめ</h2>
-<ul>
-<li>LivePlaybackSpeedControlでは、ターゲットオフセットに狙って速度を変更する。</li>
-<li>ターゲットオフセットは内部の振る舞いにより変更される。</li>
-<li>DefaultLivePlaybackSpeedControlでは比例制御が行われる。</li>
-</ul>
-<p>明日はより詳細にアルゴリズムを追います。</p>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/dev-platongs-home.html" rel="bookmark"
-                           title="Permalink to dev-platong's home">dev-platong's home</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2023-02-24T00:00:00+09:00">
-                Published: 金 24 2月 2023
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/dev-platong.html">dev-platong</a>
-        </address>
-<p>In <a href="/category/android-exoplayer.html">Android, ExoPlayer</a>.</p>
-
-</footer><!-- /.post-info -->                <p>Hello world.</p>
-                <a class="readmore" href="/dev-platongs-home.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/exoplayerimplinternalnoju-dong-wozhui-usheng-cheng-mawari.html" rel="bookmark"
-                           title="Permalink to ExoPlayerImplInternalの挙動を追う（生成まわり）">ExoPlayerImplInternalの挙動を追う（生成まわり）</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2023-02-24T00:00:00+09:00">
-                Published: 金 24 2月 2023
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/dev-platong.html">dev-platong</a>
-        </address>
-<p>In <a href="/category/android-exoplayer.html">Android, ExoPlayer</a>.</p>
-
-</footer><!-- /.post-info -->                <h2>ExoPlayerImplInternalの生成時</h2>
-<h3>LoadControl関連</h3>
-<p>LoadControl から 巻き戻し関連の値を取得する。</p>
-<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L248-L249">ExoPlayerImplInternal.java#L248-L249</a></p>
-<h3>PlaybackInfo関連</h3>
-<p>ダミーのPlaybackInfoインスタンスと、それに基づく PlaybackInfoUpdateク …</p>
-                <a class="readmore" href="/exoplayerimplinternalnoju-dong-wozhui-usheng-cheng-mawari.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/exoplayergasheng-cheng-sarerushi-ju-ti-de-nihadonnakurasugasheng-cheng-sarerunoka.html" rel="bookmark"
-                           title="Permalink to ExoPlayerが生成される時、具体的にはどんなクラスが生成されるのか">ExoPlayerが生成される時、具体的にはどんなクラスが生成されるのか</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2023-02-23T00:00:00+09:00">
-                Published: 木 23 2月 2023
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/dev-platong.html">dev-platong</a>
-        </address>
-<p>In <a href="/category/android-exoplayer.html">Android, ExoPlayer</a>.</p>
-
-</footer><!-- /.post-info -->                <h2>概要</h2>
-<p>ExoPlayerでの再生問題におけるトラブルシューティング迅速化のため、再生に関わるクラスを把握する。<br>
-今回はDefault実装 …</p>
-                <a class="readmore" href="/exoplayergasheng-cheng-sarerushi-ju-ti-de-nihadonnakurasugasheng-cheng-sarerunoka.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-                </ol><!-- /#posts-list -->
-                </section><!-- /#content -->
+<section id="content" class="body">
+    <h1 class="entry-title">dev-platong's home</h1>
+    
+    <p>Hello world.</p>
+</section>
         <section id="extras" class="body">
                 <div class="blogroll">
                         <h2>links</h2>
