@@ -1,5 +1,6 @@
 Title: Low Latency時に快適な再生：LivePlaybackSpeedControlの挙動を追う
 Date: 2023-2-25
+LastModified: 2023-2-26
 Category: Android, ExoPlayer
 Authors: dev-platong
 
@@ -52,4 +53,4 @@ Authors: dev-platong
 - ターゲットオフセットは内部の振る舞いにより変更される。
 - DefaultLivePlaybackSpeedControlでは比例制御が行われる。
 
-明日はより詳細にアルゴリズムを追います。
+明日はより詳細に[アルゴリズムを追います。](./exoplayer_detail_of_liveplaybackspeedcontrol.md)
