@@ -20,7 +20,67 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/liveplaybackspeedcontrolnoxiang-xi-arugorizumu.html">LivePlaybackSpeedControlの詳細（アルゴリズム）</a></h1>
+                    <h1 class="entry-title"><a href="/simpleexoplayernosheng-cheng-shi.html">SimpleExoPlayerの生成時</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2023-02-27T00:00:00+09:00">
+                Published: 月 27 2月 2023
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/dev-platong.html">dev-platong</a>
+        </address>
+<p>In <a href="/category/android-exoplayer.html">Android, ExoPlayer</a>.</p>
+
+</footer><!-- /.post-info --><h2>Constructing時に関連するクラス・プロパティ</h2>
+<ul>
+<li>PriorityTaskManager： その名の通り優先的にタスクを実行するクラス</li>
+<li>AudioAttributes： 全てのAPIでサポートできる android.media.AudioAttributes の強化版</li>
+<li>VideoScalingMode： クロップかfitするためのスケールしかない。デフォルトはfit。MediaCodecベースの Renderer が利用可能で、SurfaceViewが出力に指定されている時に利用できる。</li>
+<li>VideoChangeFrameRateStrategy：後述</li>
+<li>skipSilenceEnabled：無音の音声ストリームをスキップするか、デフォルトはfalse</li>
+<li>detachSurfaceTimeoutMs： プレイヤーからSurfaceがデタッチされるタイムアウト秒数（ms）。</li>
+<li>ComponentListener： 一般的な説明は後述。SimpleExoPlayerは、AnalyticsCollectorと、個別に登録したlisntersに処理を委譲するだけだが、例外もいくつかあるため都度覗くこと。</li>
+<li>FrameMetadataListener：ビデオフレームに紐付くメタデータのリッスンと、カメラモーションのリッスン。</li>
+<li>renderes：RendererFactoryから生成します。</li>
+<li>volume：デフォルトで1です。</li>
+<li>currentCues：空のリスト</li>
+<li>throwsWhenUsingWrongThread：デフォルトでtrueです。再生スレッド以外からプレイヤーが触れられた時に例外をスローします。</li>
+<li>AudioBecomingNoisyManager：後述</li>
+<li>AudioFocusManager：　Audio Focusが何のことか分からないので<a href="https://github.com/dev-platong/dev-platong.github.io/issues/12">いずれ調べます。</a></li>
+<li>StreamVolumeManager： android.media.AudioManagerのラップクラスです。音声ストリームのボリュームを扱います。</li>
+<li>WakeLockManager：<a href="https://developer.android.com/training/scheduling/wakelock?hl=ja">androidのWakeLock</a>を扱います。</li>
+<li>WifiLockManager：<a href="https://developer.android.com/reference/android/net/wifi/WifiManager.WifiLock">androidのWifiLock</a>を扱います。</li>
+<li>DeviceInfo：再生しているデバイスの情報を持ちます。といってもローカルかリモートか（キャスト）とminVolumeとmaxVolumeくらいです。（命名変更が求められるところ）</li>
+<li>videoSize：VideoSize.UNKNOWNで生成されます。</li>
+</ul>
+<p>その後は、rendererにメッセージをセットして終わりです。</p>
+<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/SimpleExoPlayer.java#L430">SimpleExoPlayer.java#L430</a></p>
+<h3>VideoChangeFrameRateStrategy</h3>
+<p>MediaCodecベースのRendererが利用可能な場合に利用できる。<br>
+アプリケーションは、 Surfaceの <code>CHANGE_FRAME_RATE_ALWAYS</code> を <code>C#VIDEO_CHANGE_FRAME_RATE_STRATEGY_OFF</code> にセットした上で、ExoPlayerが <code>Surface#setFrameRate</code> を操作して実現する。</p>
+<h3>ComponentListener</h3>
+<p>ExoPlayerでは、各クラスでprivate finalで実装されているリスナーです。</p>
+<h3>AudioBecomingNoisyManager</h3>
+<p>デフォルトではBuilderの <code>handleAudioBecomingNoisy</code> が <code>false</code> のため、機能しません。</p>
+<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayer.java#L422">ExoPlayer.java#L422</a></p>
+<p>この機能を <code>true</code> にする場合には、<code>AUDIO_BECOMING_NOIDY</code> の検出時に <code>playWhenReady</code> が <code>false</code> になります。</p>
+<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/SimpleExoPlayer.java#L2032-L2037">SimpleExoPlayer.java#L2032-L2037</a></p>
+<h2>まとめ</h2>
+<p>ExoPlayerImplやExoPlayerImplInternalで具体的な処理を行うため、SimpleExoではより付加価値的なクラス生成を行なっている。<br>
+明日はExoPlayerImplの生成時挙動を追います。</p>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/liveplaybackspeedcontrolnoxiang-xi-arugorizumu.html" rel="bookmark"
+                           title="Permalink to LivePlaybackSpeedControlの詳細（アルゴリズム）">LivePlaybackSpeedControlの詳細（アルゴリズム）</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2023-02-26T00:00:00+09:00">
                 Published: 日 26 2月 2023
@@ -31,58 +91,12 @@
         </address>
 <p>In <a href="/category/android-exoplayer.html">Android, ExoPlayer</a>.</p>
 
-</footer><!-- /.post-info --><h2>maybeXXXに</h2>
+</footer><!-- /.post-info -->                <h2>maybeXXXに</h2>
 <p>ExoPlayerには <code>maybeXXX()</code> というメソッドが多々ある。<br>
-何かしらの副作用を引き起こす可能性があるメソッドであり、読むときは条件に注目して読むことになる。</p>
-<h2>TargetLiveOffsetのリセット</h2>
-<p><code>maybeResetTargetLiveOffset()</code> が <code>LiveConfiguration</code> が更新されるか、<code>targetLiveOffset</code> が更新される場合に呼ばれます。</p>
-<p><a href="https://github.com/google/ExoPlayer/blob/release-v2/library/core/src/main/java/com/google/android/exoplayer2/DefaultLivePlaybackSpeedControl.java#L299-L322">DefaultLivePlaybackSpeedControl.java#L299-L322</a></p>
-<p><code>targetLiveOffsetOverrideUs</code> があれば、これを <code>idealTargetLiveOffset</code> と <code>currentTargetLiveOffset</code> に設定する。
- ない場合には LiveConfiguration経由のtargetOffset （ <code>mediaConfigurationTargetLiveOffsetUs</code> ） を設定する。</p>
-<p>すでに <code>idealTargetLiveOffset</code> が <code>idealOffsetUs</code> と同じ秒数だった場合にはアーリーリターンする。</p>
-<ul>
-<li>smoothedMinPossibleLiveOffsetUs</li>
-<li>smoothedMinPossibleLiveOffsetDeviationUs</li>
-<li>lastPlaybackSpeedUpdateMs</li>
-</ul>
-<p>がリセットされる。</p>
-<h2>リバッファリングが起きた時、</h2>
-<p><code>targetLiveOffsetRebufferDeltaUs</code> 　の分だけ <code>currentTargetLiveOffsetUs</code> を増やし、 <code>lastPlaybackSpeedUpdateMs</code> をアンセットします。</p>
-<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/DefaultLivePlaybackSpeedControl.java#L321">DefaultLivePlaybackSpeedControl.java#L321</a></p>
-<h2>平滑化（線形）</h2>
-<p>引数として渡された2つの値を、<code>smoothingFactor</code> の割合で足し合わせます。</p>
-<div class="highlight"><pre><span></span><code><span class="nv">private</span> <span class="nv">static</span> <span class="nv">long</span> <span class="nv">smooth</span><span class="ss">(</span><span class="nv">long</span> <span class="nv">smoothedValue</span>, <span class="nv">long</span> <span class="nv">newValue</span>, <span class="nv">float</span> <span class="nv">smoothingFactor</span><span class="ss">)</span> {
-    <span class="k">return</span> <span class="ss">(</span><span class="nv">long</span><span class="ss">)</span> <span class="ss">(</span><span class="nv">smoothingFactor</span> <span class="o">*</span> <span class="nv">smoothedValue</span> <span class="o">+</span> <span class="ss">(</span><span class="mi">1</span><span class="nv">f</span> <span class="o">-</span> <span class="nv">smoothingFactor</span><span class="ss">)</span> <span class="o">*</span> <span class="nv">newValue</span><span class="ss">)</span><span class="c1">;</span>
-  }
-</code></pre></div>
-
-<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/DefaultLivePlaybackSpeedControl.java#L443-L445">DefaultLivePlaybackSpeedControl.java#L443-L445</a></p>
-<h2>SmoothedMinPossibleLiveOffsetUs のアップデート</h2>
-<p><code>liveOffsetUs</code> と <code>bufferedDurationUs</code> の差をとり <code>minPossibleLiveOffsetUs</code> とします。仮に <code>liveOffset</code> が 8us、 <code>bugfferedDurationUs</code> が 5us の場合、 <code>minPossibleLiveOffsetUs</code> は 3us となります。</p>
-<p>その後、  <code>minPossibleLiveOffsetUs</code> そのままのものと、 <code>minPossibleLiveOffsetUs</code> と <code>smoothedMinPossibleLiveOffsetUs</code> で 平滑化したものを比較し大きい方を <code>smoothedMinPossibleLiveOffsetUs</code> とします。これは安全で可能な値のうち、トラックをより良い値に保持すべきだからです。</p>
-<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/DefaultLivePlaybackSpeedControl.java#L394-L402">DefaultLivePlaybackSpeedControl.java#L394-L402</a></p>
-<p><code>minPossibleLiveOffsetDeviationUs</code> は <code>minPossibleLiveOffsetUs</code> と <code>smoothedMinPossibleLiveOffsetUs</code> の差です。（<code>minPossibleLiveOffsetUs</code> が採択された場合この値は0になります。）</p>
-<h2>TargetLiveOffsetの調整</h2>
-<p><code>safeOffsetUs</code> を minPossibleLiveOffsetDeviationUs を <code>smoothedMinPossibleLiveOffsetUs + 3 * smoothedMinPossibleLiveOffsetDeviationUs;</code> と定義します。</p>
-<p><code>currentTargetLiveOffsetUs</code> の値を <code>safeOffsetUs</code> に近づけていきます。</p>
-<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/DefaultLivePlaybackSpeedControl.java#L413">DefaultLivePlaybackSpeedControl.java#L413</a></p>
-<h2>調整後のスピードの取得</h2>
-<p><code>mediaConfigurationTargetLiveOffsetUs</code> が TIME_UNSET の場合は常に1です。（狙うOffsetがないため）</p>
-<p>引数として渡された <code>liveOffset</code> で <code>currentTargetLiveOffset</code> の値を変化させたのちに、その差をとります。（currentTargetLiveOffsetはsafeOffsetに寄っているため値に差が出ます。）</p>
-<p>この値が速度を変化させるべき値となるため、その値にFactorをかけて速度を調整します。</p>
-<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/DefaultLivePlaybackSpeedControl.java#L334">DefaultLivePlaybackSpeedControl.java#L334</a></p>
-<h2>まとめ</h2>
-<ul>
-<li>線形平滑化を利用する。（前回の値を考慮する）</li>
-<li>前回の値を考慮しながらtargetOffsetを調整している。</li>
-<li>速度の調整は、渡されたTargetOffsetからcurrentTargetOffsetの値を前回の値を考慮しつつ変化させ、差を取って決定する。</li>
-</ul>
-<p>明日はExoPlayerでMediaが再生されるまでの追っかけに戻ります。</p>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+何かしらの副作用を引き起こす可能性があるメソッドであり、読むときは条 …</p>
+                <a class="readmore" href="/liveplaybackspeedcontrolnoxiang-xi-arugorizumu.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>
