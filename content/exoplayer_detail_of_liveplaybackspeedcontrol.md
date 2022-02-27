@@ -1,6 +1,6 @@
 Title: LivePlaybackSpeedControlの詳細（アルゴリズム）
 Date: 2023-2-26
-LastModified: 2023-2-26
+LastModified: 2023-2-27
 Category: Android, ExoPlayer
 Authors: dev-platong
 
@@ -81,4 +81,4 @@ private static long smooth(long smoothedValue, long newValue, float smoothingFac
 - 前回の値を考慮しながらtargetOffsetを調整している。
 - 速度の調整は、渡されたTargetOffsetからcurrentTargetOffsetの値を前回の値を考慮しつつ変化させ、差を取って決定する。
 
-明日はExoPlayerでMediaが再生されるまでの追っかけに戻ります。
+明日はExoPlayer生成時に戻り、[SimpleExoPlayerの生成時に何が起きるかを追います。](./exoplayer_constructing_simpleexoplayer.md)
