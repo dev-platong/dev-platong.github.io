@@ -41,8 +41,46 @@
 <p><a href="https://github.com/google/ExoPlayer/blob/029a2b27cbdc27cf9d51d4a73ebeb503968849f6/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L692">ExoPlayerImplInternal.java#L692</a></p>
 <p>最終的に<code>handleMediaSourceListInfoRefreshed()</code>が呼ばれます。このメソッドは長すぎるので明日。</p>
 <p><a href="https://github.com/google/ExoPlayer/blob/029a2b27cbdc27cf9d51d4a73ebeb503968849f6/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L1793">ExoPlayerImplInternal.java#L1793</a></p>
+<h2>private ExoPlayerImplInternal.handleMediaSourceListInfoRefreshed(Timeline timeline, boolean isSourceRefresh)</h2>
+<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L1793">ExoPlayerImplInternal.java#L1793</a></p>
+<h3><code>resolvePositionForPlaylistChange(Timeline timeline, PlaybackInfo playbackInfo, @Nullable SeekPosition pendingInitialSeekPosition, MediaPeriodQueue queue, @RepeatMode int repeatMode, boolean shuffleModeEnabled, Timeline.Window window, Timeline.Period period)</code></h3>
+<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L2508">ExoPlayerImplInternal.java#L2508</a></p>
+<h4>SeekPosition</h4>
+<p>データクラスです（<code>private static final class</code> ）。<br>
+<code>Timeline</code>・<code>int windowIndex</code>・<code>long windowPositionUs</code> を持ちます。これにより <strong>シークにはPeriodという概念が関係ない（windowとwindow内の位置が決まればいい）</strong> ということがわかります。</p>
+<p><a href="https://github.com/google/ExoPlayer/blob/029a2b27cbdc27cf9d51d4a73ebeb503968849f6/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L2922">ExoPlayerImplInternal.java#L2922</a></p>
+<p>特徴的なのは、まず <code>Timeline</code> に関して。 位置の特定が必要な場合には、 <code>Timeline</code> ・ <code>Timeline.Window</code>・ <code>Timeline・Period</code> が渡されます。<br>
+そして <code>Timeline</code> は empty の場合があることにも注意しなければなりません。SEE：<a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L2517">ExoPlayerImplInternal.java#L2517</a></p>
+<p>次に、 MediaPeriodIdとPeriodUidの扱いです。MediaPeriodIdは <code>old</code> なのに対し、 <code>PeriodUid</code> に関しては <code>new</code> として扱っています。</p>
+<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L2526-L2527">ExoPlayerImplInternal.java#L2526-L2527</a></p>
+<p>次の <code>Timeline.Period</code> がプレースホルダーである場合についての言及です。</p>
+<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L2528">ExoPlayerImplInternal.java#L2528</a></p>
+<p><code>isUsingPlaceholderPeriod()</code> は <code>Timeline.Period.isPlaceholder</code> を使って確認します（この時 Timeline.isEmptyに関する検査はアーリーリターンをしているため不要です）。</p>
+<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L2682-L2687">ExoPlayerImplInternal.java#L2682-L2687</a></p>
+<p>そして、 <code>oldContentPosition</code> を ad かどうかとプレースホルダーかどうかに留意しながら決定します。 <code>newContentPosition</code> は一時的に <code>oldContentPosition</code> と一致させます（のちに変更するわけです）。</p>
+<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L2529-L2533">ExoPlayerImplInternal.java#L2529-L2533</a></p>
+<p>その後に、シークを考慮しながら以下の値を決定していきます。</p>
+<div class="highlight"><pre><span></span><code>int startAtDefaultPositionWindowIndex = C.INDEX_UNSET;
+boolean forceBufferingState = false;
+boolean endPlayback = false;
+boolean setTargetLiveOffset = false;
+</code></pre></div>
+
+<p><a href="https://github.com/google/ExoPlayer/blob/029a2b27cbdc27cf9d51d4a73ebeb503968849f6/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L2534-L2537">ExoPlayerImplInternal.java#L2534-L2537</a></p>
+<h5>一度目のペンディングされたシークかどうか</h5>
+<p><a href="https://github.com/google/ExoPlayer/blob/029a2b27cbdc27cf9d51d4a73ebeb503968849f6/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L2538">ExoPlayerImplInternal.java#L2538</a></p>
+<h6>resolveSeekPosition</h6>
+<p><a href="https://github.com/google/ExoPlayer/blob/029a2b27cbdc27cf9d51d4a73ebeb503968849f6/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L2796">ExoPlayerImplInternal.java#L2796</a></p>
+<p>引数として、位置の特定に必要な <code>Timeline</code>・<code>Timeline.Window</code>・<code>Timeline.Period</code>と <code>SeekPosition</code>、後はパラメータ類です。（<code>boolean trySubsequentPeriods, @RepeatMode int repeatMode, boolean shuffleModeEnabled</code>）</p>
+<p>中身は複雑なので深く触れませんが、 <code>Timeline.getPeriodPosition(window, period, seekPosition.windowIndex, seekPosition.windowPositionUs);</code> を読んでその値を返します。</p>
+<p><code>resolveSeekPosition()</code>が呼ばれ、結果がnullなら <code>endPlayback = true, startAtDefaultPositionWindowIndex = timeline.getFirstWindowIndex(shuffleModeEnabled);</code> となります。これはどうやらinitial seekに失敗した場合のようです。  </p>
+<p><strong>かなり曖昧なので、明日も続きを書いていきます。</strong></p>
+<h3>PositionUpdateForPlaylistChange</h3>
+<p>名前の通りのデータクラスです。<br>
+<code>private final static class</code> なので、完全に <code>ExoPlayerImplInternal</code> のみで利用されます （ExoPlayerImplInternalの1つの特徴でこのクラスより下の階層のクラスがないためだと考えます）。</p>
+<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L2935">ExoPlayerImplInternal.java#L2935</a></p>
 <h2>まとめ</h2>
-<p>やはりExoPlayerImplInternalのあるメソッドまで落ちてくる。明日は <code>handleMediaSourceListInfoRefreshed()</code> を詳解します。</p>                </article>
+<p>やはりExoPlayerImplInternalのあるメソッドまで落ちてくる。明日は <code>resolveSeekPosition()</code> の続きから。</p>                </article>
             </aside><!-- /#featured -->
                 <section id="content" class="body">
                     <h1>Other articles</h1>
