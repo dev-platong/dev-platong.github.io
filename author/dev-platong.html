@@ -20,7 +20,42 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/simpleexoplayernosheng-cheng-shi.html">SimpleExoPlayerの生成時</a></h1>
+                    <h1 class="entry-title"><a href="/exoplayernosetmediaitemwodu-ndashi.html">ExoPlayerのsetMediaItemを読んだ時</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2023-02-28T00:00:00+09:00">
+                Published: 火 28 2月 2023
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/dev-platong.html">dev-platong</a>
+        </address>
+<p>In <a href="/category/android-exoplayer.html">Android, ExoPlayer</a>.</p>
+
+</footer><!-- /.post-info --><h2>ExoPlayer.setMediaItemを呼びます。</h2>
+<p><code>ExoPlayerImpl.setMediaSourcesInternal()</code> が呼ばれます。</p>
+<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImpl.java#L1529">exoplayer2/ExoPlayerImpl.java#L1529</a></p>
+<p>仰々しいですが、やっていることは <code>internalPlayer.setMediaSources()</code> を呼び、 <code>updatePlaybackInfo()</code> を呼びます。</p>
+<h2>ExoPlayerImplInternal.setMediaSources()</h2>
+<p><code>MSG_SET_MEDIA_SOURCES</code> を Targetに送ります。そして自身の <code>setMediaItemsInternal()</code> を呼びます。</p>
+<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L522-L523">ExoPlayerImplInternal.java#L522-L523</a></p>
+<p><a href="https://github.com/google/ExoPlayer/blob/029a2b27cbdc27cf9d51d4a73ebeb503968849f6/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L692">ExoPlayerImplInternal.java#L692</a></p>
+<p>最終的に<code>handleMediaSourceListInfoRefreshed()</code>が呼ばれます。このメソッドは長すぎるので明日。</p>
+<p><a href="https://github.com/google/ExoPlayer/blob/029a2b27cbdc27cf9d51d4a73ebeb503968849f6/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L1793">ExoPlayerImplInternal.java#L1793</a></p>
+<h2>まとめ</h2>
+<p>やはりExoPlayerImplInternalのあるメソッドまで落ちてくる。明日は <code>handleMediaSourceListInfoRefreshed()</code> を詳解します。</p>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/simpleexoplayernosheng-cheng-shi.html" rel="bookmark"
+                           title="Permalink to SimpleExoPlayerの生成時">SimpleExoPlayerの生成時</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2023-02-27T00:00:00+09:00">
                 Published: 月 27 2月 2023
@@ -31,48 +66,13 @@
         </address>
 <p>In <a href="/category/android-exoplayer.html">Android, ExoPlayer</a>.</p>
 
-</footer><!-- /.post-info --><h2>Constructing時に関連するクラス・プロパティ</h2>
+</footer><!-- /.post-info -->                <h2>Constructing時に関連するクラス・プロパティ</h2>
 <ul>
 <li>PriorityTaskManager： その名の通り優先的にタスクを実行するクラス</li>
-<li>AudioAttributes： 全てのAPIでサポートできる android.media.AudioAttributes の強化版</li>
-<li>VideoScalingMode： クロップかfitするためのスケールしかない。デフォルトはfit。MediaCodecベースの Renderer が利用可能で、SurfaceViewが出力に指定されている時に利用できる。</li>
-<li>VideoChangeFrameRateStrategy：後述</li>
-<li>skipSilenceEnabled：無音の音声ストリームをスキップするか、デフォルトはfalse</li>
-<li>detachSurfaceTimeoutMs： プレイヤーからSurfaceがデタッチされるタイムアウト秒数（ms）。</li>
-<li>ComponentListener： 一般的な説明は後述。SimpleExoPlayerは、AnalyticsCollectorと、個別に登録したlisntersに処理を委譲するだけだが、例外もいくつかあるため都度覗くこと。</li>
-<li>FrameMetadataListener：ビデオフレームに紐付くメタデータのリッスンと、カメラモーションのリッスン。</li>
-<li>renderes：RendererFactoryから生成します。</li>
-<li>volume：デフォルトで1です。</li>
-<li>currentCues：空のリスト</li>
-<li>throwsWhenUsingWrongThread：デフォルトでtrueです。再生スレッド以外からプレイヤーが触れられた時に例外をスローします。</li>
-<li>AudioBecomingNoisyManager：後述</li>
-<li>AudioFocusManager：　Audio Focusが何のことか分からないので<a href="https://github.com/dev-platong/dev-platong.github.io/issues/12">いずれ調べます。</a></li>
-<li>StreamVolumeManager： android.media.AudioManagerのラップクラスです。音声ストリームのボリュームを扱います。</li>
-<li>WakeLockManager：<a href="https://developer.android.com/training/scheduling/wakelock?hl=ja">androidのWakeLock</a>を扱います。</li>
-<li>WifiLockManager：<a href="https://developer.android.com/reference/android/net/wifi/WifiManager.WifiLock">androidのWifiLock</a>を扱います。</li>
-<li>DeviceInfo：再生しているデバイスの情報を持ちます。といってもローカルかリモートか（キャスト）とminVolumeとmaxVolumeくらいです。（命名変更が求められるところ）</li>
-<li>videoSize：VideoSize.UNKNOWNで生成されます。</li>
-</ul>
-<p>その後は、rendererにメッセージをセットして終わりです。</p>
-<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/SimpleExoPlayer.java#L430">SimpleExoPlayer.java#L430</a></p>
-<h3>VideoChangeFrameRateStrategy</h3>
-<p>MediaCodecベースのRendererが利用可能な場合に利用できる。<br>
-アプリケーションは、 Surfaceの <code>CHANGE_FRAME_RATE_ALWAYS</code> を <code>C#VIDEO_CHANGE_FRAME_RATE_STRATEGY_OFF</code> にセットした上で、ExoPlayerが <code>Surface#setFrameRate</code> を操作して実現する。</p>
-<h3>ComponentListener</h3>
-<p>ExoPlayerでは、各クラスでprivate finalで実装されているリスナーです。</p>
-<h3>AudioBecomingNoisyManager</h3>
-<p>デフォルトではBuilderの <code>handleAudioBecomingNoisy</code> が <code>false</code> のため、機能しません。</p>
-<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayer.java#L422">ExoPlayer.java#L422</a></p>
-<p>この機能を <code>true</code> にする場合には、<code>AUDIO_BECOMING_NOIDY</code> の検出時に <code>playWhenReady</code> が <code>false</code> になります。</p>
-<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/SimpleExoPlayer.java#L2032-L2037">SimpleExoPlayer.java#L2032-L2037</a></p>
-<h2>まとめ</h2>
-<p>ExoPlayerImplやExoPlayerImplInternalで具体的な処理を行うため、SimpleExoではより付加価値的なクラス生成を行なっている。<br>
-明日はExoPlayerImplの生成時挙動を追います。</p>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+<li>AudioAttributes： 全てのAPIでサポートでき …</li></ul>
+                <a class="readmore" href="/simpleexoplayernosheng-cheng-shi.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>
