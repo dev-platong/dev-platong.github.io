@@ -20,7 +20,65 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/exoplayernosetmediaitemwodu-ndashi.html">ExoPlayerのsetMediaItemを読んだ時</a></h1>
+                    <h1 class="entry-title"><a href="/exoplayernosamplestreamintahuesu.html">ExoPlayerのSampleStreamインターフェース</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2023-03-07T00:00:00+09:00">
+                Published: 火 07 3月 2023
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/dev-platong.html">dev-platong</a>
+        </address>
+<p>In <a href="/category/android-exoplayer.html">Android, ExoPlayer</a>.</p>
+
+</footer><!-- /.post-info --><h1>概要</h1>
+<p>Rendererインターフェースによる動画データの描画を詰めるため、その読み込み元となるSampleStreamについて触れます。</p>
+<h1>SampleStreamインターフェースの責務</h1>
+<p>フォーマット情報に紐づいたメディアサンプルのストリームを表現する。</p>
+<h2>4つのメソッド</h2>
+<h3>boolean isReady()</h3>
+<p>読み込み可能なデータが利用できるかを返します。<br>
+終わったストリームは常にreadyであることに注意します。</p>
+<h3>void maybeThrowError() throws IOException</h3>
+<p>読み込み時にデータが阻害された場合エラーを吐きます。</p>
+<h3>@ReadDataResult int readData(FormatHolder formatHolder, DecoderInputBuffer buffer, @ReadFlags int readFlags)</h3>
+<h4>ReadDataResult</h4>
+<p><code>RESULT_NOTHING_READ</code> または <code>RESULT_FORMAT_READ</code>・ <code>RESULT_BUFFER_READ</code>が帰ります。<br>
+何も読めなかったか、フォーマットかバッファーかです。</p>
+<h4>FormatHolder</h4>
+<p>FormatクラスとDrmSessionクラスを保持します。</p>
+<h5>Format</h5>
+<p>明日やります。</p>
+<h4>DecoderInputBuffer</h4>
+<p>明後日やります。</p>
+<h4>ReadFlags</h4>
+<ul>
+<li>FLAG_PEEK：サンプルバッファが読み込まれる時、読み込みポジションは先に進むべきでは無いことを示します。</li>
+<li>FLAG_REQUIRE_FORMAT：次にバッファが読まれるときに、サンプルのフォーマットを代わりに読みます。</li>
+<li>FLAG_OMIT_SAMPLE_DATA： <code>{@link DecoderInputBuffer#data}, {@link DecoderInputBuffer#supplementalData} と {@link DecoderInputBuffer#cryptoInfo}</code>を呼ぶ必要がないことを伝えます。効率的なサンプルメタデータのピーキングや、サンプルバッファのスキップに利用されます。</li>
+</ul>
+<h3>int skipData（long positionUs）</h3>
+<p>特定のポジション以前のキーフレームをスキップすることを試みます。または、<code>positionUs</code> が EOS(End of stream)を超えている場合、データをスキップします。</p>
+<h1>まとめ</h1>
+<ul>
+<li>4つのメソッドがある。</li>
+<li>読み込む・スキップする・準備可能・エラーをスローする。</li>
+<li>DocoderInputBufferとFormatHolderが関係する。</li>
+</ul>
+<p>明日はFormatクラスについて扱います。</p>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/exoplayernosetmediaitemwodu-ndashi.html" rel="bookmark"
+                           title="Permalink to ExoPlayerのsetMediaItemを読んだ時">ExoPlayerのsetMediaItemを読んだ時</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2023-02-28T00:00:00+09:00">
                 Published: 火 28 2月 2023
@@ -31,61 +89,15 @@
         </address>
 <p>In <a href="/category/android-exoplayer.html">Android, ExoPlayer</a>.</p>
 
-</footer><!-- /.post-info --><h2>ExoPlayer.setMediaItemを呼びます。</h2>
+</footer><!-- /.post-info -->                <h2>ExoPlayer.setMediaItemを呼びます。</h2>
 <p><code>ExoPlayerImpl.setMediaSourcesInternal()</code> が呼ばれます。</p>
 <p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImpl.java#L1529">exoplayer2/ExoPlayerImpl.java#L1529</a></p>
 <p>仰々しいですが、やっていることは <code>internalPlayer.setMediaSources()</code> を呼び、 <code>updatePlaybackInfo()</code> を呼びます。</p>
 <h2>ExoPlayerImplInternal.setMediaSources()</h2>
-<p><code>MSG_SET_MEDIA_SOURCES</code> を Targetに送ります。そして自身の <code>setMediaItemsInternal()</code> を呼びます。</p>
-<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L522-L523">ExoPlayerImplInternal.java#L522-L523</a></p>
-<p><a href="https://github.com/google/ExoPlayer/blob/029a2b27cbdc27cf9d51d4a73ebeb503968849f6/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L692">ExoPlayerImplInternal.java#L692</a></p>
-<p>最終的に<code>handleMediaSourceListInfoRefreshed()</code>が呼ばれます。このメソッドは長すぎるので明日。</p>
-<p><a href="https://github.com/google/ExoPlayer/blob/029a2b27cbdc27cf9d51d4a73ebeb503968849f6/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L1793">ExoPlayerImplInternal.java#L1793</a></p>
-<h2>private ExoPlayerImplInternal.handleMediaSourceListInfoRefreshed(Timeline timeline, boolean isSourceRefresh)</h2>
-<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L1793">ExoPlayerImplInternal.java#L1793</a></p>
-<h3><code>resolvePositionForPlaylistChange(Timeline timeline, PlaybackInfo playbackInfo, @Nullable SeekPosition pendingInitialSeekPosition, MediaPeriodQueue queue, @RepeatMode int repeatMode, boolean shuffleModeEnabled, Timeline.Window window, Timeline.Period period)</code></h3>
-<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L2508">ExoPlayerImplInternal.java#L2508</a></p>
-<h4>SeekPosition</h4>
-<p>データクラスです（<code>private static final class</code> ）。<br>
-<code>Timeline</code>・<code>int windowIndex</code>・<code>long windowPositionUs</code> を持ちます。これにより <strong>シークにはPeriodという概念が関係ない（windowとwindow内の位置が決まればいい）</strong> ということがわかります。</p>
-<p><a href="https://github.com/google/ExoPlayer/blob/029a2b27cbdc27cf9d51d4a73ebeb503968849f6/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L2922">ExoPlayerImplInternal.java#L2922</a></p>
-<p>特徴的なのは、まず <code>Timeline</code> に関して。 位置の特定が必要な場合には、 <code>Timeline</code> ・ <code>Timeline.Window</code>・ <code>Timeline・Period</code> が渡されます。<br>
-そして <code>Timeline</code> は empty の場合があることにも注意しなければなりません。SEE：<a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L2517">ExoPlayerImplInternal.java#L2517</a></p>
-<p>次に、 MediaPeriodIdとPeriodUidの扱いです。MediaPeriodIdは <code>old</code> なのに対し、 <code>PeriodUid</code> に関しては <code>new</code> として扱っています。</p>
-<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L2526-L2527">ExoPlayerImplInternal.java#L2526-L2527</a></p>
-<p>次の <code>Timeline.Period</code> がプレースホルダーである場合についての言及です。</p>
-<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L2528">ExoPlayerImplInternal.java#L2528</a></p>
-<p><code>isUsingPlaceholderPeriod()</code> は <code>Timeline.Period.isPlaceholder</code> を使って確認します（この時 Timeline.isEmptyに関する検査はアーリーリターンをしているため不要です）。</p>
-<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L2682-L2687">ExoPlayerImplInternal.java#L2682-L2687</a></p>
-<p>そして、 <code>oldContentPosition</code> を ad かどうかとプレースホルダーかどうかに留意しながら決定します。 <code>newContentPosition</code> は一時的に <code>oldContentPosition</code> と一致させます（のちに変更するわけです）。</p>
-<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L2529-L2533">ExoPlayerImplInternal.java#L2529-L2533</a></p>
-<p>その後に、シークを考慮しながら以下の値を決定していきます。</p>
-<div class="highlight"><pre><span></span><code>int startAtDefaultPositionWindowIndex = C.INDEX_UNSET;
-boolean forceBufferingState = false;
-boolean endPlayback = false;
-boolean setTargetLiveOffset = false;
-</code></pre></div>
-
-<p><a href="https://github.com/google/ExoPlayer/blob/029a2b27cbdc27cf9d51d4a73ebeb503968849f6/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L2534-L2537">ExoPlayerImplInternal.java#L2534-L2537</a></p>
-<h5>一度目のペンディングされたシークかどうか</h5>
-<p><a href="https://github.com/google/ExoPlayer/blob/029a2b27cbdc27cf9d51d4a73ebeb503968849f6/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L2538">ExoPlayerImplInternal.java#L2538</a></p>
-<h6>resolveSeekPosition</h6>
-<p><a href="https://github.com/google/ExoPlayer/blob/029a2b27cbdc27cf9d51d4a73ebeb503968849f6/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L2796">ExoPlayerImplInternal.java#L2796</a></p>
-<p>引数として、位置の特定に必要な <code>Timeline</code>・<code>Timeline.Window</code>・<code>Timeline.Period</code>と <code>SeekPosition</code>、後はパラメータ類です。（<code>boolean trySubsequentPeriods, @RepeatMode int repeatMode, boolean shuffleModeEnabled</code>）</p>
-<p>中身は複雑なので深く触れませんが、 <code>Timeline.getPeriodPosition(window, period, seekPosition.windowIndex, seekPosition.windowPositionUs);</code> を読んでその値を返します。</p>
-<p><code>resolveSeekPosition()</code>が呼ばれ、結果がnullなら <code>endPlayback = true, startAtDefaultPositionWindowIndex = timeline.getFirstWindowIndex(shuffleModeEnabled);</code> となります。これはどうやらinitial seekに失敗した場合のようです。  </p>
-<p><strong>かなり曖昧なので、明日も続きを書いていきます。</strong></p>
-<h3>PositionUpdateForPlaylistChange</h3>
-<p>名前の通りのデータクラスです。<br>
-<code>private final static class</code> なので、完全に <code>ExoPlayerImplInternal</code> のみで利用されます （ExoPlayerImplInternalの1つの特徴でこのクラスより下の階層のクラスがないためだと考えます）。</p>
-<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L2935">ExoPlayerImplInternal.java#L2935</a></p>
-<h2>まとめ</h2>
-<p>やはりExoPlayerImplInternalのあるメソッドまで落ちてくる。明日は <code>resolveSeekPosition()</code> の続きから。</p>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+<p><code>MSG_SET_MEDIA_SOURCES …</code></p>
+                <a class="readmore" href="/exoplayernosetmediaitemwodu-ndashi.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>

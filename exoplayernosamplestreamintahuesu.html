@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="generator" content="Pelican" />
+        <title>ExoPlayerのSampleStreamインターフェース</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="dev-platong's home Atom Feed" />
+        <meta name="description" content="概要 Rendererインターフェースによる動画データの描画を詰めるため、その読み込み元となるSampleStreamについて触れます。 SampleStreamイン …" />
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">dev-platong's home</a></h1>
+                <nav><ul>
+                    <li><a href="/pages/dev-platongs-home.html">dev-platong's home</a></li>
+                    <li class="active"><a href="/category/android-exoplayer.html">Android, ExoPlayer</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/exoplayernosamplestreamintahuesu.html" rel="bookmark"
+           title="Permalink to ExoPlayerのSampleStreamインターフェース">ExoPlayerのSampleStreamインターフェース</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2023-03-07T00:00:00+09:00">
+                Published: 火 07 3月 2023
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/dev-platong.html">dev-platong</a>
+        </address>
+<p>In <a href="/category/android-exoplayer.html">Android, ExoPlayer</a>.</p>
+
+</footer><!-- /.post-info -->      <h1>概要</h1>
+<p>Rendererインターフェースによる動画データの描画を詰めるため、その読み込み元となるSampleStreamについて触れます。</p>
+<h1>SampleStreamインターフェースの責務</h1>
+<p>フォーマット情報に紐づいたメディアサンプルのストリームを表現する。</p>
+<h2>4つのメソッド</h2>
+<h3>boolean isReady()</h3>
+<p>読み込み可能なデータが利用できるかを返します。<br>
+終わったストリームは常にreadyであることに注意します。</p>
+<h3>void maybeThrowError() throws IOException</h3>
+<p>読み込み時にデータが阻害された場合エラーを吐きます。</p>
+<h3>@ReadDataResult int readData(FormatHolder formatHolder, DecoderInputBuffer buffer, @ReadFlags int readFlags)</h3>
+<h4>ReadDataResult</h4>
+<p><code>RESULT_NOTHING_READ</code> または <code>RESULT_FORMAT_READ</code>・ <code>RESULT_BUFFER_READ</code>が帰ります。<br>
+何も読めなかったか、フォーマットかバッファーかです。</p>
+<h4>FormatHolder</h4>
+<p>FormatクラスとDrmSessionクラスを保持します。</p>
+<h5>Format</h5>
+<p>明日やります。</p>
+<h4>DecoderInputBuffer</h4>
+<p>明後日やります。</p>
+<h4>ReadFlags</h4>
+<ul>
+<li>FLAG_PEEK：サンプルバッファが読み込まれる時、読み込みポジションは先に進むべきでは無いことを示します。</li>
+<li>FLAG_REQUIRE_FORMAT：次にバッファが読まれるときに、サンプルのフォーマットを代わりに読みます。</li>
+<li>FLAG_OMIT_SAMPLE_DATA： <code>{@link DecoderInputBuffer#data}, {@link DecoderInputBuffer#supplementalData} と {@link DecoderInputBuffer#cryptoInfo}</code>を呼ぶ必要がないことを伝えます。効率的なサンプルメタデータのピーキングや、サンプルバッファのスキップに利用されます。</li>
+</ul>
+<h3>int skipData（long positionUs）</h3>
+<p>特定のポジション以前のキーフレームをスキップすることを試みます。または、<code>positionUs</code> が EOS(End of stream)を超えている場合、データをスキップします。</p>
+<h1>まとめ</h1>
+<ul>
+<li>4つのメソッドがある。</li>
+<li>読み込む・スキップする・準備可能・エラーをスローする。</li>
+<li>DocoderInputBufferとFormatHolderが関係する。</li>
+</ul>
+<p>明日はFormatクラスについて扱います。</p>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>links</h2>
+                        <ul>
+                            <li><a href="https://getpelican.com/">Pelican</a></li>
+                            <li><a href="https://www.python.org/">Python.org</a></li>
+                            <li><a href="https://palletsprojects.com/p/jinja/">Jinja2</a></li>
+                            <li><a href="#">You can modify those links in your config file</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+                            <li><a href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="#">You can add links in your config file</a></li>
+                            <li><a href="#">Another social link</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a href="https://www.python.org/">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>
