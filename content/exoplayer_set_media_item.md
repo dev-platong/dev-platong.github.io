@@ -1,6 +1,6 @@
 Title: ExoPlayerのsetMediaItemを読んだ時
 Date: 2023-2-28
-LastModified: 2023-3-1
+LastModified: 2023-3-7
 Category: Android, ExoPlayer
 Authors: dev-platong
 
@@ -93,4 +93,4 @@ boolean setTargetLiveOffset = false;
 
 ## まとめ
 
-やはりExoPlayerImplInternalのあるメソッドまで落ちてくる。明日は `resolveSeekPosition()` の続きから。
+やはりExoPlayerImplInternalのあるメソッドまで落ちてくる。 `resolveSeekPosition()` の続きからは https://github.com/dev-platong/dev-platong.github.io/issues/19。
