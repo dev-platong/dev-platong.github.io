@@ -1,23 +1,28 @@
 Title: ExoPlayerのSampleStreamインターフェース
 Date: 2023-3-7
-LastModified: 2023-3-7
+LastModified: 2023-3-10
 Category: Android, ExoPlayer
 Authors: dev-platong
 
 # 概要
 
-Rendererインターフェースによる動画データの描画を詰めるため、その読み込み元となるSampleStreamについて触れます。
+Rendererインターフェースによる動画データの描画の挙動を追っていく過程です。  
+Rendererがデータを読み込んでいるSampleStreamについて触れます。
 
-# SampleStreamインターフェースの責務
+## SampleStreamインターフェースの責務
 
-フォーマット情報に紐づいたメディアサンプルのストリームを表現する。
+フォーマット情報が紐づいたメディアサンプルのストリームを表現します。
+
+## 空間
+
+sourceパッケージです（`com.google.android.exoplayer2.source`）。
 
 ## 4つのメソッド
 
 ### boolean isReady()
 
 読み込み可能なデータが利用できるかを返します。  
-終わったストリームは常にreadyであることに注意します。
+EOSは常にreadyであることに注意します。
 
 ### void maybeThrowError() throws IOException
 
@@ -25,22 +30,22 @@ Rendererインターフェースによる動画データの描画を詰めるた
 
 ### @ReadDataResult int readData(FormatHolder formatHolder, DecoderInputBuffer buffer, @ReadFlags int readFlags)
 
-#### ReadDataResult
+#### @ReadDataResult
 
 `RESULT_NOTHING_READ` または `RESULT_FORMAT_READ`・ `RESULT_BUFFER_READ`が帰ります。  
 何も読めなかったか、フォーマットかバッファーかです。
 
-#### FormatHolder
+#### FormatHolderファイナルクラス
 
 FormatクラスとDrmSessionクラスを保持します。
 
-##### Format
+##### Formatファイナルクラス
 
-明日やります。
+[記事](./exoplayer_format.md)をご覧ください。
 
 #### DecoderInputBuffer
 
-明後日やります。
+[記事](./exoplayer_decoder_input_buffer.md)をご覧ください。
 
 #### ReadFlags
 
