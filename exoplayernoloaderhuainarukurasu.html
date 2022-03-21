@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="generator" content="Pelican" />
+        <title>ExoPlayerのLoaderファイナルクラス</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="dev-platong's home Atom Feed" />
+        <meta name="description" content="Overview HlsSampleStreamWrapperを見ていたら、出てきたので軽めに触れる。 責務 Loadableインターフェースを持つもののバックグラウンドでの管理。 基 …" />
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">dev-platong's home</a></h1>
+                <nav><ul>
+                    <li><a href="/pages/dev-platongs-home.html">dev-platong's home</a></li>
+                    <li class="active"><a href="/category/android-exoplayer.html">Android, ExoPlayer</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/exoplayernoloaderhuainarukurasu.html" rel="bookmark"
+           title="Permalink to ExoPlayerのLoaderファイナルクラス">ExoPlayerのLoaderファイナルクラス</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2023-03-10T00:00:00+09:00">
+                Published: 金 10 3月 2023
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/dev-platong.html">dev-platong</a>
+        </address>
+<p>In <a href="/category/android-exoplayer.html">Android, ExoPlayer</a>.</p>
+
+</footer><!-- /.post-info -->      <h1>Overview</h1>
+<p>HlsSampleStreamWrapperを見ていたら、出てきたので軽めに触れる。</p>
+<h2>責務</h2>
+<p>Loadableインターフェースを持つもののバックグラウンドでの管理。</p>
+<h2>基底</h2>
+<p>LoaderErrorThrower：条件によって例外をスローするか判断する <code>maybeThrowError()</code>を持つ。</p>
+<h2>空間</h2>
+<p><code>upstream</code> 空間</p>
+<h1>定義クラス・例外・インターフェース</h1>
+<h2>例外：UnexpectedLoaderException</h2>
+<p>IOExceptionの拡張。特別な機能は持たない。</p>
+<h1>インターフェース：Loadable</h1>
+<h2>責務</h2>
+<p>Loaderによってloadされるオブジェクト</p>
+<p><code>cancelLoad()</code> メソッドと <code>load()</code> メソッドを持つ。</p>
+<h2>インターフェース；Callback(T extends Loadable)</h2>
+<ul>
+<li><code>void onLoadCompleted(T loadable, long elapsedRealtimeMs, long loadDurationMs)</code></li>
+<li><code>void onLoadCancled(T loadable, long elapsedRealtimeMs, long loadDurationMs, boolean released)</code></li>
+<li><code>LoadErrorAction onLoadError(T loadable, long elapsedRealtimeMs, long loadDurationMs, IOException error, int errorCount)</code></li>
+</ul>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>links</h2>
+                        <ul>
+                            <li><a href="https://getpelican.com/">Pelican</a></li>
+                            <li><a href="https://www.python.org/">Python.org</a></li>
+                            <li><a href="https://palletsprojects.com/p/jinja/">Jinja2</a></li>
+                            <li><a href="#">You can modify those links in your config file</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+                            <li><a href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="#">You can add links in your config file</a></li>
+                            <li><a href="#">Another social link</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a href="https://www.python.org/">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>

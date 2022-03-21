@@ -20,7 +20,132 @@
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/exoplayernosamplestreamintahuesu.html">ExoPlayerのSampleStreamインターフェース</a></h1>
+                    <h1 class="entry-title"><a href="/exoplayernoloaderhuainarukurasu.html">ExoPlayerのLoaderファイナルクラス</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2023-03-10T00:00:00+09:00">
+                Published: 金 10 3月 2023
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/dev-platong.html">dev-platong</a>
+        </address>
+<p>In <a href="/category/android-exoplayer.html">Android, ExoPlayer</a>.</p>
+
+</footer><!-- /.post-info --><h1>Overview</h1>
+<p>HlsSampleStreamWrapperを見ていたら、出てきたので軽めに触れる。</p>
+<h2>責務</h2>
+<p>Loadableインターフェースを持つもののバックグラウンドでの管理。</p>
+<h2>基底</h2>
+<p>LoaderErrorThrower：条件によって例外をスローするか判断する <code>maybeThrowError()</code>を持つ。</p>
+<h2>空間</h2>
+<p><code>upstream</code> 空間</p>
+<h1>定義クラス・例外・インターフェース</h1>
+<h2>例外：UnexpectedLoaderException</h2>
+<p>IOExceptionの拡張。特別な機能は持たない。</p>
+<h1>インターフェース：Loadable</h1>
+<h2>責務</h2>
+<p>Loaderによってloadされるオブジェクト</p>
+<p><code>cancelLoad()</code> メソッドと <code>load()</code> メソッドを持つ。</p>
+<h2>インターフェース；Callback(T extends Loadable)</h2>
+<ul>
+<li><code>void onLoadCompleted(T loadable, long elapsedRealtimeMs, long loadDurationMs)</code></li>
+<li><code>void onLoadCancled(T loadable, long elapsedRealtimeMs, long loadDurationMs, boolean released)</code></li>
+<li><code>LoadErrorAction onLoadError(T loadable, long elapsedRealtimeMs, long loadDurationMs, IOException error, int errorCount)</code></li>
+</ul>                </article>
+            </aside><!-- /#featured -->
+                <section id="content" class="body">
+                    <h1>Other articles</h1>
+                    <hr />
+                    <ol id="posts-list" class="hfeed">
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/exoplayernobufferkurasu.html" rel="bookmark"
+                           title="Permalink to ExoPlayerのBufferクラス">ExoPlayerのBufferクラス</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2023-03-09T00:00:00+09:00">
+                Published: 木 09 3月 2023
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/dev-platong.html">dev-platong</a>
+        </address>
+<p>In <a href="/category/android-exoplayer.html">Android, ExoPlayer</a>.</p>
+
+</footer><!-- /.post-info -->                <h1>Overview</h1>
+<p>SampleStreamに渡されるDecoderInputBufferを掘っていく途中で基底となるBuffer抽象クラスを見ます。</p>
+<h1>責務</h1>
+<p>バッファとフラグの基底クラス。</p>
+<h2>フラ …</h2>
+                <a class="readmore" href="/exoplayernobufferkurasu.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/exoplayernodecoderinputbufferkurasu.html" rel="bookmark"
+                           title="Permalink to ExoPlayerのDecoderInputBufferクラス">ExoPlayerのDecoderInputBufferクラス</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2023-03-09T00:00:00+09:00">
+                Published: 木 09 3月 2023
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/dev-platong.html">dev-platong</a>
+        </address>
+<p>In <a href="/category/android-exoplayer.html">Android, ExoPlayer</a>.</p>
+
+</footer><!-- /.post-info -->                <h1>Overview</h1>
+<p>SampleStreamで <code>readData()</code> 時に渡される <code>DecoderInputBuffer</code> クラスについて調べる。</p>
+<h2>責務</h2>
+<p>デコーダへの入力を保持します。  </p>
+<h2>基底</h2>
+<p><a href="./exoplayer_buffer.md">Buffer抽象クラス</a></p>
+<h2>@BufferReplacementMode</h2>
+<p>既存のバ …</p>
+                <a class="readmore" href="/exoplayernodecoderinputbufferkurasu.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/exoplayernoformatkurasu.html" rel="bookmark"
+                           title="Permalink to ExoPlayerのFormatクラス">ExoPlayerのFormatクラス</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2023-03-09T00:00:00+09:00">
+                Published: 木 09 3月 2023
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/dev-platong.html">dev-platong</a>
+        </address>
+<p>In <a href="/category/android-exoplayer.html">Android, ExoPlayer</a>.</p>
+
+</footer><!-- /.post-info -->                <h1>概要</h1>
+<p>SampleStreamがreadData()する際に渡される FormatHolder から掘り下げます。</p>
+<h2>責務</h2>
+<p>メディアフォーマットを表現します。finalクラスです。</p>
+<h3>全てのフ …</h3>
+                <a class="readmore" href="/exoplayernoformatkurasu.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/exoplayernohlssamplestreamhuainarukurasu.html" rel="bookmark"
+                           title="Permalink to ExoPlayerのHlsSampleStreamファイナルクラス">ExoPlayerのHlsSampleStreamファイナルクラス</a></h1>
+                </header>
+
+                <div class="entry-content">
 <footer class="post-info">
         <abbr class="published" title="2023-03-07T00:00:00+09:00">
                 Published: 火 07 3月 2023
@@ -31,46 +156,70 @@
         </address>
 <p>In <a href="/category/android-exoplayer.html">Android, ExoPlayer</a>.</p>
 
-</footer><!-- /.post-info --><h1>概要</h1>
-<p>Rendererインターフェースによる動画データの描画を詰めるため、その読み込み元となるSampleStreamについて触れます。</p>
-<h1>SampleStreamインターフェースの責務</h1>
-<p>フォーマット情報に紐づいたメディアサンプルのストリームを表現する。</p>
-<h2>4つのメソッド</h2>
-<h3>boolean isReady()</h3>
-<p>読み込み可能なデータが利用できるかを返します。<br>
-終わったストリームは常にreadyであることに注意します。</p>
-<h3>void maybeThrowError() throws IOException</h3>
-<p>読み込み時にデータが阻害された場合エラーを吐きます。</p>
-<h3>@ReadDataResult int readData(FormatHolder formatHolder, DecoderInputBuffer buffer, @ReadFlags int readFlags)</h3>
-<h4>ReadDataResult</h4>
-<p><code>RESULT_NOTHING_READ</code> または <code>RESULT_FORMAT_READ</code>・ <code>RESULT_BUFFER_READ</code>が帰ります。<br>
-何も読めなかったか、フォーマットかバッファーかです。</p>
-<h4>FormatHolder</h4>
-<p>FormatクラスとDrmSessionクラスを保持します。</p>
-<h5>Format</h5>
-<p>明日やります。</p>
-<h4>DecoderInputBuffer</h4>
-<p>明後日やります。</p>
-<h4>ReadFlags</h4>
-<ul>
-<li>FLAG_PEEK：サンプルバッファが読み込まれる時、読み込みポジションは先に進むべきでは無いことを示します。</li>
-<li>FLAG_REQUIRE_FORMAT：次にバッファが読まれるときに、サンプルのフォーマットを代わりに読みます。</li>
-<li>FLAG_OMIT_SAMPLE_DATA： <code>{@link DecoderInputBuffer#data}, {@link DecoderInputBuffer#supplementalData} と {@link DecoderInputBuffer#cryptoInfo}</code>を呼ぶ必要がないことを伝えます。効率的なサンプルメタデータのピーキングや、サンプルバッファのスキップに利用されます。</li>
-</ul>
-<h3>int skipData（long positionUs）</h3>
-<p>特定のポジション以前のキーフレームをスキップすることを試みます。または、<code>positionUs</code> が EOS(End of stream)を超えている場合、データをスキップします。</p>
-<h1>まとめ</h1>
-<ul>
-<li>4つのメソッドがある。</li>
-<li>読み込む・スキップする・準備可能・エラーをスローする。</li>
-<li>DocoderInputBufferとFormatHolderが関係する。</li>
-</ul>
-<p>明日はFormatクラスについて扱います。</p>                </article>
-            </aside><!-- /#featured -->
-                <section id="content" class="body">
-                    <h1>Other articles</h1>
-                    <hr />
-                    <ol id="posts-list" class="hfeed">
+</footer><!-- /.post-info -->                <h1>Overview</h1>
+<p>SampleStreamを読んだので、その実装クラスを見ていきます。</p>
+<h1>責務</h1>
+<p>HLSの中の特定のサンプルキューを表現します。</p>
+<h1>HlsSampleStreamWrapperファイナル …</h1>
+                <a class="readmore" href="/exoplayernohlssamplestreamhuainarukurasu.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/exoplayernosamplestreamintahuesu.html" rel="bookmark"
+                           title="Permalink to ExoPlayerのSampleStreamインターフェース">ExoPlayerのSampleStreamインターフェース</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2023-03-07T00:00:00+09:00">
+                Published: 火 07 3月 2023
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/dev-platong.html">dev-platong</a>
+        </address>
+<p>In <a href="/category/android-exoplayer.html">Android, ExoPlayer</a>.</p>
+
+</footer><!-- /.post-info -->                <h1>概要</h1>
+<p>Rendererインターフェースによる動画データの描画の挙動を追っていく過程です。<br>
+Rendererがデータを読み込んでいるSampleStreamに …</p>
+                <a class="readmore" href="/exoplayernosamplestreamintahuesu.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/exoplayernosequenceableloaderintahuesu.html" rel="bookmark"
+                           title="Permalink to ExoPlayerのSequenceableLoaderインターフェース">ExoPlayerのSequenceableLoaderインターフェース</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2023-03-07T00:00:00+09:00">
+                Published: 火 07 3月 2023
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/dev-platong.html">dev-platong</a>
+        </address>
+<p>In <a href="/category/android-exoplayer.html">Android, ExoPlayer</a>.</p>
+
+</footer><!-- /.post-info -->                <h1>Overview</h1>
+<p>HlsSampleWrapperがimplementsしているので。</p>
+<h2>責務</h2>
+<p>他のローダーと同期的に進行可能なローダー。</p>
+<h2>基底</h2>
+<p>なし</p>
+<h2>空間</h2>
+<p><code>source</code></p>
+<h1>インターフェース</h1>
+<h2>Callback<T extends SequencableLoader></h2>
+<p><code>void onContinueLoadingRequested …</code></p>
+                <a class="readmore" href="/exoplayernosequenceableloaderintahuesu.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
 
             <li><article class="hentry">
                 <header>
@@ -147,81 +296,12 @@
                 <a class="readmore" href="/liveplaybackspeedcontrolnoxiang-xi-arugorizumu.html">read more</a>
                 </div><!-- /.entry-content -->
             </article></li>
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/low-latencyshi-nikuai-shi-nazai-sheng-liveplaybackspeedcontrolnoju-dong-wozhui-u.html" rel="bookmark"
-                           title="Permalink to Low Latency時に快適な再生：LivePlaybackSpeedControlの挙動を追う">Low Latency時に快適な再生：LivePlaybackSpeedControlの挙動を追う</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2023-02-25T00:00:00+09:00">
-                Published: 土 25 2月 2023
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/dev-platong.html">dev-platong</a>
-        </address>
-<p>In <a href="/category/android-exoplayer.html">Android, ExoPlayer</a>.</p>
-
-</footer><!-- /.post-info -->                <h2>Live再生時にMediaに設定される LiveConfigurationクラス</h2>
-<p>オフセットと再生速度のmin/maxが設定できる。オフセットに関してはターゲット …</p>
-                <a class="readmore" href="/low-latencyshi-nikuai-shi-nazai-sheng-liveplaybackspeedcontrolnoju-dong-wozhui-u.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/exoplayerimplinternalnoju-dong-wozhui-usheng-cheng-mawari.html" rel="bookmark"
-                           title="Permalink to ExoPlayerImplInternalの挙動を追う（生成まわり）">ExoPlayerImplInternalの挙動を追う（生成まわり）</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2023-02-24T00:00:00+09:00">
-                Published: 金 24 2月 2023
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/dev-platong.html">dev-platong</a>
-        </address>
-<p>In <a href="/category/android-exoplayer.html">Android, ExoPlayer</a>.</p>
-
-</footer><!-- /.post-info -->                <h2>ExoPlayerImplInternalの生成時</h2>
-<h3>LoadControl関連</h3>
-<p>LoadControl から 巻き戻し関連の値を取得する。</p>
-<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L248-L249">ExoPlayerImplInternal.java#L248-L249</a></p>
-<h3>PlaybackInfo関連</h3>
-<p>ダミーのPlaybackInfoインスタンスと、それに基づく PlaybackInfoUpdateク …</p>
-                <a class="readmore" href="/exoplayerimplinternalnoju-dong-wozhui-usheng-cheng-mawari.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
-
-            <li><article class="hentry">
-                <header>
-                    <h1><a href="/exoplayergasheng-cheng-sarerushi-ju-ti-de-nihadonnakurasugasheng-cheng-sarerunoka.html" rel="bookmark"
-                           title="Permalink to ExoPlayerが生成される時、具体的にはどんなクラスが生成されるのか">ExoPlayerが生成される時、具体的にはどんなクラスが生成されるのか</a></h1>
-                </header>
-
-                <div class="entry-content">
-<footer class="post-info">
-        <abbr class="published" title="2023-02-23T00:00:00+09:00">
-                Published: 木 23 2月 2023
-        </abbr>
-
-        <address class="vcard author">
-                By                         <a class="url fn" href="/author/dev-platong.html">dev-platong</a>
-        </address>
-<p>In <a href="/category/android-exoplayer.html">Android, ExoPlayer</a>.</p>
-
-</footer><!-- /.post-info -->                <h2>概要</h2>
-<p>ExoPlayerでの再生問題におけるトラブルシューティング迅速化のため、再生に関わるクラスを把握する。<br>
-今回はDefault実装 …</p>
-                <a class="readmore" href="/exoplayergasheng-cheng-sarerushi-ju-ti-de-nihadonnakurasugasheng-cheng-sarerunoka.html">read more</a>
-                </div><!-- /.entry-content -->
-            </article></li>
                 </ol><!-- /#posts-list -->
+<p class="paginator">
+    Page 1 / 2
+        <a href="/author/dev-platong2.html">&raquo;</a>
+        <a href="/author/dev-platong2.html">&#8649;</a>
+</p>
                 </section><!-- /#content -->
         <section id="extras" class="body">
                 <div class="blogroll">

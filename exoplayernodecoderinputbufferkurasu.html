@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="generator" content="Pelican" />
+        <title>ExoPlayerのDecoderInputBufferクラス</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="dev-platong's home Atom Feed" />
+        <meta name="description" content="Overview SampleStreamで readData() 時に渡される DecoderInputBuffer クラスについて調べる。 責務 デコーダへの入力を保持します。 基底 Buffer抽象クラス @BufferReplacementMode 既存のバ …" />
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">dev-platong's home</a></h1>
+                <nav><ul>
+                    <li><a href="/pages/dev-platongs-home.html">dev-platong's home</a></li>
+                    <li class="active"><a href="/category/android-exoplayer.html">Android, ExoPlayer</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/exoplayernodecoderinputbufferkurasu.html" rel="bookmark"
+           title="Permalink to ExoPlayerのDecoderInputBufferクラス">ExoPlayerのDecoderInputBufferクラス</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2023-03-09T00:00:00+09:00">
+                Published: 木 09 3月 2023
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/dev-platong.html">dev-platong</a>
+        </address>
+<p>In <a href="/category/android-exoplayer.html">Android, ExoPlayer</a>.</p>
+
+</footer><!-- /.post-info -->      <h1>Overview</h1>
+<p>SampleStreamで <code>readData()</code> 時に渡される <code>DecoderInputBuffer</code> クラスについて調べる。</p>
+<h2>責務</h2>
+<p>デコーダへの入力を保持します。  </p>
+<h2>基底</h2>
+<p><a href="./exoplayer_buffer.md">Buffer抽象クラス</a></p>
+<h2>@BufferReplacementMode</h2>
+<p>既存のバッファのキャパシティが十分でない場合に<code>ensureSpaceForWrite</code> でどのように置換バッファを生成するかをコントロールします。</p>
+<ul>
+<li>BUFFER_REPLACEMENT_MODE_DISABLED</li>
+<li>BUFFER_REPLACEMENT_MODE_NORMAL： <code>ByteBuffer.allocate(int)</code>を用いたバッファ置換を許容します。</li>
+<li>BUFFER_REPLACEMENT_MODE_DIRECT： <code>ByteBuffer.allocateDirect(int)</code> を用いたバッファ置換を許容します。</li>
+</ul>
+<h2>InsufficientCapacityExceptionファイナルクラス</h2>
+<p><code>BUFFER_REPLACEMENT_MODE_DISABLED</code> または 十分なキャパシティを持っていない場合の DocoderInputBufferへの書き込み時にスローします。</p>
+<h2>保持するByteBuffer</h2>
+<p>dataフィールドにデータを持つことはもちろんですが、supplementalDataを持つ可能性もあります。<br>
+バッファは補完データを持つ場合にはポジション0からそのリミットまでバッファが入力されます。</p>
+<h2>その他関連クラス</h2>
+<ul>
+<li>Format</li>
+<li>CryptInfo</li>
+<li>Nullable ByteBuffer</li>
+</ul>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>links</h2>
+                        <ul>
+                            <li><a href="https://getpelican.com/">Pelican</a></li>
+                            <li><a href="https://www.python.org/">Python.org</a></li>
+                            <li><a href="https://palletsprojects.com/p/jinja/">Jinja2</a></li>
+                            <li><a href="#">You can modify those links in your config file</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+                            <li><a href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="#">You can add links in your config file</a></li>
+                            <li><a href="#">Another social link</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a href="https://www.python.org/">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>

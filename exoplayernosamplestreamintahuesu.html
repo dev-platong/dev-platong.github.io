@@ -7,7 +7,7 @@
         <title>ExoPlayerのSampleStreamインターフェース</title>
         <link rel="stylesheet" href="/theme/css/main.css" />
         <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="dev-platong's home Atom Feed" />
-        <meta name="description" content="概要 Rendererインターフェースによる動画データの描画を詰めるため、その読み込み元となるSampleStreamについて触れます。 SampleStreamイン …" />
+        <meta name="description" content="概要 Rendererインターフェースによる動画データの描画の挙動を追っていく過程です。 Rendererがデータを読み込んでいるSampleStreamに …" />
 </head>
 
 <body id="index" class="home">
@@ -38,25 +38,28 @@
 <p>In <a href="/category/android-exoplayer.html">Android, ExoPlayer</a>.</p>
 
 </footer><!-- /.post-info -->      <h1>概要</h1>
-<p>Rendererインターフェースによる動画データの描画を詰めるため、その読み込み元となるSampleStreamについて触れます。</p>
-<h1>SampleStreamインターフェースの責務</h1>
-<p>フォーマット情報に紐づいたメディアサンプルのストリームを表現する。</p>
+<p>Rendererインターフェースによる動画データの描画の挙動を追っていく過程です。<br>
+Rendererがデータを読み込んでいるSampleStreamについて触れます。</p>
+<h2>SampleStreamインターフェースの責務</h2>
+<p>フォーマット情報が紐づいたメディアサンプルのストリームを表現します。</p>
+<h2>空間</h2>
+<p>sourceパッケージです（<code>com.google.android.exoplayer2.source</code>）。</p>
 <h2>4つのメソッド</h2>
 <h3>boolean isReady()</h3>
 <p>読み込み可能なデータが利用できるかを返します。<br>
-終わったストリームは常にreadyであることに注意します。</p>
+EOSは常にreadyであることに注意します。</p>
 <h3>void maybeThrowError() throws IOException</h3>
 <p>読み込み時にデータが阻害された場合エラーを吐きます。</p>
 <h3>@ReadDataResult int readData(FormatHolder formatHolder, DecoderInputBuffer buffer, @ReadFlags int readFlags)</h3>
-<h4>ReadDataResult</h4>
+<h4>@ReadDataResult</h4>
 <p><code>RESULT_NOTHING_READ</code> または <code>RESULT_FORMAT_READ</code>・ <code>RESULT_BUFFER_READ</code>が帰ります。<br>
 何も読めなかったか、フォーマットかバッファーかです。</p>
-<h4>FormatHolder</h4>
+<h4>FormatHolderファイナルクラス</h4>
 <p>FormatクラスとDrmSessionクラスを保持します。</p>
-<h5>Format</h5>
-<p>明日やります。</p>
+<h5>Formatファイナルクラス</h5>
+<p><a href="./exoplayer_format.md">記事</a>をご覧ください。</p>
 <h4>DecoderInputBuffer</h4>
-<p>明後日やります。</p>
+<p><a href="./exoplayer_decoder_input_buffer.md">記事</a>をご覧ください。</p>
 <h4>ReadFlags</h4>
 <ul>
 <li>FLAG_PEEK：サンプルバッファが読み込まれる時、読み込みポジションは先に進むべきでは無いことを示します。</li>

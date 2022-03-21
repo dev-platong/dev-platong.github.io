@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="generator" content="Pelican" />
+        <title>ExoPlayerのFormatクラス</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="dev-platong's home Atom Feed" />
+        <meta name="description" content="概要 SampleStreamがreadData()する際に渡される FormatHolder から掘り下げます。 責務 メディアフォーマットを表現します。finalクラスです。 全てのフ …" />
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">dev-platong's home</a></h1>
+                <nav><ul>
+                    <li><a href="/pages/dev-platongs-home.html">dev-platong's home</a></li>
+                    <li class="active"><a href="/category/android-exoplayer.html">Android, ExoPlayer</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/exoplayernoformatkurasu.html" rel="bookmark"
+           title="Permalink to ExoPlayerのFormatクラス">ExoPlayerのFormatクラス</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2023-03-09T00:00:00+09:00">
+                Published: 木 09 3月 2023
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/dev-platong.html">dev-platong</a>
+        </address>
+<p>In <a href="/category/android-exoplayer.html">Android, ExoPlayer</a>.</p>
+
+</footer><!-- /.post-info -->      <h1>概要</h1>
+<p>SampleStreamがreadData()する際に渡される FormatHolder から掘り下げます。</p>
+<h2>責務</h2>
+<p>メディアフォーマットを表現します。finalクラスです。</p>
+<h3>全てのフォーマットに共通する8つのフィールド</h3>
+<ul>
+<li>id（Nullable String）</li>
+<li>label</li>
+<li>language</li>
+<li>selectionFlags</li>
+<li>roleFlags</li>
+<li>averageBitrate</li>
+<li>codecs</li>
+<li>metadata</li>
+</ul>
+<h3>コンテナフォーマットに共通するフィールド</h3>
+<p>コンテナMIME TYPEを持つ場合。<br>
+コンテナが単一のメディアトラックしか含まない場合は、後述のサンプルフォーマットと同じになります。</p>
+<h3>サンプルフォーマットに共通するフィールド</h3>
+<ul>
+<li>sampleMimeType</li>
+<li>maxInputsize</li>
+<li>initializationData</li>
+<li>drmInitData</li>
+<li>subsampleOffsetUs</li>
+</ul>
+<h3>ビデオフォーマットに共通するフィールド</h3>
+<ul>
+<li>width</li>
+<li>height</li>
+<li>frameRate</li>
+<li>rotationDegrees</li>
+<li>pixelWidthHeightRatio</li>
+<li>projectionData</li>
+<li>stereoMode</li>
+<li>colorInfo</li>
+</ul>
+<h3>音声フォーマットに共通するフィールド</h3>
+<ul>
+<li>channelCount</li>
+<li>sampleRate</li>
+<li>pcmEncoding</li>
+<li>encoderDelay</li>
+<li>encoderPadding</li>
+</ul>
+<h3>テキストフォーマットに共通するフィールド</h3>
+<ul>
+<li>accessibilityChannel</li>
+</ul>
+<h1>メソッドなど</h1>
+<p>getter/setterの他に、copyや音声サンプルフォーマットなどを想定した <code>createAudioSampleFormat()</code> などがありますが、基本的にはデータの塊と捉えていいのではない得ていいのでは。</p>
+<p>https://github.com/google/ExoPlayer/blob/r2.17.0/library%2Fcommon%2Fsrc%2Fmain%2Fjava%2Fcom%2Fgoogle%2Fandroid%2Fexoplayer2%2FFormat.java</p>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>links</h2>
+                        <ul>
+                            <li><a href="https://getpelican.com/">Pelican</a></li>
+                            <li><a href="https://www.python.org/">Python.org</a></li>
+                            <li><a href="https://palletsprojects.com/p/jinja/">Jinja2</a></li>
+                            <li><a href="#">You can modify those links in your config file</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+                            <li><a href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="#">You can add links in your config file</a></li>
+                            <li><a href="#">Another social link</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a href="https://www.python.org/">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>

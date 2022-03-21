@@ -4,9 +4,10 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="generator" content="Pelican" />
-        <title>dev-platong's home</title>
+        <title>ExoPlayerのHlsSampleStreamファイナルクラス</title>
         <link rel="stylesheet" href="/theme/css/main.css" />
         <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="dev-platong's home Atom Feed" />
+        <meta name="description" content="Overview SampleStreamを読んだので、その実装クラスを見ていきます。 責務 HLSの中の特定のサンプルキューを表現します。 HlsSampleStreamWrapperファイナル …" />
 </head>
 
 <body id="index" class="home">
@@ -14,42 +15,37 @@
                 <h1><a href="/">dev-platong's home</a></h1>
                 <nav><ul>
                     <li><a href="/pages/dev-platongs-home.html">dev-platong's home</a></li>
-                    <li><a href="/category/android-exoplayer.html">Android, ExoPlayer</a></li>
+                    <li class="active"><a href="/category/android-exoplayer.html">Android, ExoPlayer</a></li>
                 </ul></nav>
         </header><!-- /#banner -->
 <section id="content" class="body">
-<h1>Archives for dev-platong's home</h1>
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/exoplayernohlssamplestreamhuainarukurasu.html" rel="bookmark"
+           title="Permalink to ExoPlayerのHlsSampleStreamファイナルクラス">ExoPlayerのHlsSampleStreamファイナルクラス</a></h1>
+    </header>
 
-<dl>
-    <dt>金 10 3月 2023</dt>
-    <dd><a href="/exoplayernoloaderhuainarukurasu.html">ExoPlayerのLoaderファイナルクラス</a></dd>
-    <dt>木 09 3月 2023</dt>
-    <dd><a href="/exoplayernobufferkurasu.html">ExoPlayerのBufferクラス</a></dd>
-    <dt>木 09 3月 2023</dt>
-    <dd><a href="/exoplayernodecoderinputbufferkurasu.html">ExoPlayerのDecoderInputBufferクラス</a></dd>
-    <dt>木 09 3月 2023</dt>
-    <dd><a href="/exoplayernoformatkurasu.html">ExoPlayerのFormatクラス</a></dd>
-    <dt>火 07 3月 2023</dt>
-    <dd><a href="/exoplayernohlssamplestreamhuainarukurasu.html">ExoPlayerのHlsSampleStreamファイナルクラス</a></dd>
-    <dt>火 07 3月 2023</dt>
-    <dd><a href="/exoplayernosamplestreamintahuesu.html">ExoPlayerのSampleStreamインターフェース</a></dd>
-    <dt>火 07 3月 2023</dt>
-    <dd><a href="/exoplayernosequenceableloaderintahuesu.html">ExoPlayerのSequenceableLoaderインターフェース</a></dd>
-    <dt>火 28 2月 2023</dt>
-    <dd><a href="/exoplayernosetmediaitemwodu-ndashi.html">ExoPlayerのsetMediaItemを読んだ時</a></dd>
-    <dt>月 27 2月 2023</dt>
-    <dd><a href="/simpleexoplayernosheng-cheng-shi.html">SimpleExoPlayerの生成時</a></dd>
-    <dt>日 26 2月 2023</dt>
-    <dd><a href="/liveplaybackspeedcontrolnoxiang-xi-arugorizumu.html">LivePlaybackSpeedControlの詳細（アルゴリズム）</a></dd>
-    <dt>土 25 2月 2023</dt>
-    <dd><a href="/low-latencyshi-nikuai-shi-nazai-sheng-liveplaybackspeedcontrolnoju-dong-wozhui-u.html">Low Latency時に快適な再生：LivePlaybackSpeedControlの挙動を追う</a></dd>
-    <dt>金 24 2月 2023</dt>
-    <dd><a href="/exoplayerimplinternalnoju-dong-wozhui-usheng-cheng-mawari.html">ExoPlayerImplInternalの挙動を追う（生成まわり）</a></dd>
-    <dt>木 23 2月 2023</dt>
-    <dd><a href="/exoplayergasheng-cheng-sarerushi-ju-ti-de-nihadonnakurasugasheng-cheng-sarerunoka.html">ExoPlayerが生成される時、具体的にはどんなクラスが生成されるのか</a></dd>
-    <dt>水 09 3月 2022</dt>
-    <dd><a href="/exoplayernorendererintahuesu.html">ExoPlayerのRendererインターフェース</a></dd>
-</dl>
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2023-03-07T00:00:00+09:00">
+                Published: 火 07 3月 2023
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/dev-platong.html">dev-platong</a>
+        </address>
+<p>In <a href="/category/android-exoplayer.html">Android, ExoPlayer</a>.</p>
+
+</footer><!-- /.post-info -->      <h1>Overview</h1>
+<p>SampleStreamを読んだので、その実装クラスを見ていきます。</p>
+<h1>責務</h1>
+<p>HLSの中の特定のサンプルキューを表現します。</p>
+<h1>HlsSampleStreamWrapperファイナルクラス</h1>
+<p>こちらが本体といってもいいほど巨大なクラスです。</p>
+    </div><!-- /.entry-content -->
+
+  </article>
 </section>
         <section id="extras" class="body">
                 <div class="blogroll">

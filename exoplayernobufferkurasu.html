@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="generator" content="Pelican" />
+        <title>ExoPlayerのBufferクラス</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="dev-platong's home Atom Feed" />
+        <meta name="description" content="Overview SampleStreamに渡されるDecoderInputBufferを掘っていく途中で基底となるBuffer抽象クラスを見ます。 責務 バッファとフラグの基底クラス。 フラ …" />
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">dev-platong's home</a></h1>
+                <nav><ul>
+                    <li><a href="/pages/dev-platongs-home.html">dev-platong's home</a></li>
+                    <li class="active"><a href="/category/android-exoplayer.html">Android, ExoPlayer</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/exoplayernobufferkurasu.html" rel="bookmark"
+           title="Permalink to ExoPlayerのBufferクラス">ExoPlayerのBufferクラス</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2023-03-09T00:00:00+09:00">
+                Published: 木 09 3月 2023
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/dev-platong.html">dev-platong</a>
+        </address>
+<p>In <a href="/category/android-exoplayer.html">Android, ExoPlayer</a>.</p>
+
+</footer><!-- /.post-info -->      <h1>Overview</h1>
+<p>SampleStreamに渡されるDecoderInputBufferを掘っていく途中で基底となるBuffer抽象クラスを見ます。</p>
+<h1>責務</h1>
+<p>バッファとフラグの基底クラス。</p>
+<h2>フラグの6種類</h2>
+<ul>
+<li>KEY_FRAME：バッファが同期サンプルを持っていることを示す。</li>
+<li>END_OF_STREAM：EOSのシグナルとなるからのバッファであることを示す。</li>
+<li>HAS_SUPPLEMENTAL_DATA：バッファが補完的なデータを持っていることを示す。</li>
+<li>LAST_SAMPLE：ストリームの最後のメディアサンプルであることを知られているものを含んでいることを示す。</li>
+<li>ENCRYPTED：バッファが一部または全て暗号化されている。</li>
+<li>DECODE_ONLY：レンダリングされないものを示す。</li>
+</ul>
+<p><a href="https://github.com/google/ExoPlayer/blob/r2.17.0/library%2Fcommon%2Fsrc%2Fmain%2Fjava%2Fcom%2Fgoogle%2Fandroid%2Fexoplayer2%2FC.java#L480-L510">C.java#L480-L510</a></p>
+<p><a href="https://github.com/google/ExoPlayer/blob/r2.17.0/library/decoder/src/main/java/com/google/android/exoplayer2/decoder/Buffer.java">Buffer.java</a></p>
+<h2>振る舞い</h2>
+<p>Bufferクラスでは主にフラグの扱いを定義している。<br>
+持っているフラグから、 <code>isDecodeOnly</code> かなどを判定しているだけ。<br>
+フラグはset/add/clearできる。</p>
+<h1>まとめ</h1>
+<p>フラグについての振る舞いしか定義されていない。フラグは6つある。</p>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>links</h2>
+                        <ul>
+                            <li><a href="https://getpelican.com/">Pelican</a></li>
+                            <li><a href="https://www.python.org/">Python.org</a></li>
+                            <li><a href="https://palletsprojects.com/p/jinja/">Jinja2</a></li>
+                            <li><a href="#">You can modify those links in your config file</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+                            <li><a href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="#">You can add links in your config file</a></li>
+                            <li><a href="#">Another social link</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a href="https://www.python.org/">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>

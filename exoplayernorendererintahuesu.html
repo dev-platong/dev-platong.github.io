@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="generator" content="Pelican" />
+        <title>ExoPlayerのRendererインターフェース</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="dev-platong's home Atom Feed" />
+        <meta name="description" content="Overview 満を辞してRendererを読みます。 責務 SampleStreamクラスからメディアをレンダリングします。 内部的には ExoPlayer によってレンダラーの …" />
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">dev-platong's home</a></h1>
+                <nav><ul>
+                    <li><a href="/pages/dev-platongs-home.html">dev-platong's home</a></li>
+                    <li class="active"><a href="/category/android-exoplayer.html">Android, ExoPlayer</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/exoplayernorendererintahuesu.html" rel="bookmark"
+           title="Permalink to ExoPlayerのRendererインターフェース">ExoPlayerのRendererインターフェース</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2022-03-09T00:00:00+09:00">
+                Published: 水 09 3月 2022
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/dev-platong.html">dev-platong</a>
+        </address>
+<p>In <a href="/category/android-exoplayer.html">Android, ExoPlayer</a>.</p>
+
+</footer><!-- /.post-info -->      <h1>Overview</h1>
+<p>満を辞してRendererを読みます。</p>
+<h2>責務</h2>
+<p>SampleStreamクラスからメディアをレンダリングします。<br>
+内部的には ExoPlayer によってレンダラーのライフサイクルは管理されます。<br>
+レンダラーは可能なトラック変更と全ての再生状態のような様々なステートに移行します。</p>
+<h2>WakeUpLisener</h2>
+<p>いくつかのレンダラーは <code>render()</code> メソッドが呼ばれるべき時を通知します。<br>
+これはプレイヤーが次にウェイクアップするまでスリープすることを可能にします（タイトループの中で <code>render()</code> メソッドを呼ぶ代わりです）。<br>
+割り込みベースのスケジューリングの目的は、電力消費を抑えることにあります。</p>
+<ul>
+<li>void onSleep(long wakeupDeadlineMs)</li>
+<li>void onWakeup()</li>
+</ul>
+<p><a href="https://github.com/google/ExoPlayer/blob/r2.17.0/library%2Fcore%2Fsrc%2Fmain%2Fjava%2Fcom%2Fgoogle%2Fandroid%2Fexoplayer2%2FRenderer.java#L59-L78">Renderer.java#L59-L78</a></p>
+<h2>MessageType</h2>
+<p>レンダラーに渡すことができるメッセージのタイプを示します。アプリケーション定義の値を <code>MSG_CUSTOM_BASE</code> を使って持てることに注意。</p>
+<ul>
+<li>
+<p>VIDEO_OUTPUT</p>
+<p><code>ExoPlayer.createMesssage()</code> を通じてビデオレンダラに渡されるメッセージ。<br>
+payloadはSurfaceであることが通常だが、いくつのビデオレンダラーは他の <code>VideoDecoderOutputBufferRenderer</code> などにも出力できる。</p>
+</li>
+<li>
+<p>VOLUME</p>
+<p><code>ExoPlayer.createMesssage()</code> を通じてオーディオレンダラに渡されるメッセージ。<br>
+payloadは0~1のFloat。</p>
+</li>
+<li>
+<p>AUDIO_ATTRIBUTES</p>
+<p><code>ExoPlayer.createMesssage()</code> を通じてオーディオレンダラに渡されるメッセージ。  <br>
+payloadはオーディオトラックに設定されることになる <code>AudioAttributes</code> クラスのインスタンスであるべき。 何も設定されなければ、一般的なメディア再生に向いているデフォルトが使われる。<br>
+再生中の設定がオーディオトラックを再生成することで短いオーディオギャップを生む可能性があります。</p>
+</li>
+<li>
+<p>SCALING_MODE</p>
+<p><code>ExoPlayer.createMesssage()</code> を通じてMediaCodecベースのビデオレンダラに渡されるメッセージ。payloadは <code>C.VideoScalingMode</code> の1つである必要があります。<br>
+Scalingモードは <code>android.view.SurfaceView</code> によってターゲットレンダラーが所有されている時のみ利用可能です。</p>
+</li>
+<li>
+<p>CHANGE_FRAME_RATE_STRATEGY</p>
+<p><code>ExoPlayer.createMesssage()</code> を通じてビデオレンダラに渡されるメッセージ。<br>
+payloadは<code>C.VideoChangeFrameRateStrategy</code> の1つである必要があります。</p>
+</li>
+<li>
+<p>AUX_EFFECT_INFO</p>
+<p><code>ExoPlayer.createMesssage()</code> を通じてオーディオレンダラに渡されるメッセージ。  <br>
+補助オーディオエフェクトを意味する <code>AuxEffectInfo</code> がpayloadになるべきです。</p>
+</li>
+<li>
+<p>VIDEO_FRAME_METADATA_LISTEN</p>
+<p><code>ExoPlayer.createMesssage()</code> を通じてビデオレンダラに渡されるメッセージ。<br>
+<code>VideoFrameMetadataListener</code> インスタンスがpayloadであるべき。</p>
+</li>
+<li>
+<p>CAMERA_MOTION_LISTENER</p>
+<p><code>ExoPlayer.createMesssage()</code> を通じてカメラモーションレンダラに渡されるメッセージ。<br>
+<code>CameraMotionListener</code> がpayloadであるべき。</p>
+</li>
+<li>
+<p>SKIP_SILENCE_ENABLED</p>
+<p><code>ExoPlayer.createMesssage()</code> を通じてオーディオレンダラに渡されるメッセージ。  <br>
+無音をスキップするか否かをpayloadに渡します。</p>
+</li>
+<li>
+<p>AUDIO_SESSION_ID</p>
+<p><code>ExoPlayer.createMesssage()</code> を通じてビデオレンダラとオーディオレンダラに渡されるメッセージ。<br>
+payloadはオーディオセッションIDを表すintで、下のオーディオトラックにアタッチされるもので、ビデオレンダラがトンネリングをサポートするなれば、オーディオセッションIDを利用します。</p>
+</li>
+<li>
+<p>WAKEUP_LISTENER</p>
+<p><code>ExoPlayer.createMesssage()</code> を通じて <code>Renderer</code> インターフェースに渡されるメッセージ。<br>
+レンダラーが他のコンポーネントのウェイクアップが可能なことを知らせます。</p>
+</li>
+</ul>
+<p><a href="https://github.com/google/ExoPlayer/blob/r2.17.0/library%2Fcore%2Fsrc%2Fmain%2Fjava%2Fcom%2Fgoogle%2Fandroid%2Fexoplayer2%2FRenderer.java#L80-L204">Renderer.java#L80-L204</a></p>
+<h2>State</h2>
+<p><img src="https://exoplayer.dev/doc/reference/com/google/android/exoplayer2/doc-files/renderer-states.svg"/></p>
+<ul>
+<li>
+<p>DISABLED</p>
+<p>レンダラーが利用不可。メディアデコーダなどのレンダリングに必要なものを得ていません。もしかしたら継続的に利用可能なものを持っているかもしれません。<br>
+<code>reset()</code> を呼ぶことで強制的にそういった保持しているリソースを強制解放できます。</p>
+</li>
+<li>
+<p>ENABLED</p>
+<p>レンダラーが利用可能だが始まってはいません。このステートは、初めのビデオフレームのような現在のポジションのメディアをレンダリングしているかもしれません。<br>
+ですがポジションが先に進むことはありません。メディアデコーダなどのレンダリングに必要なリソースを保持していると考えるのが一般的なこのステートへの考え方です。</p>
+</li>
+<li>
+<p>STARTED</p>
+<p>レンダラーが始まっています。 <code>renderer()</code> メソッドを飛ぶことでメディアのレンダーが始まります。</p>
+</li>
+</ul>
+<p><a href="https://github.com/google/ExoPlayer/blob/r2.17.0/library%2Fcore%2Fsrc%2Fmain%2Fjava%2Fcom%2Fgoogle%2Fandroid%2Fexoplayer2%2FRenderer.java#L206-L231">Renderer.java#L206-L231</a></p>
+<h2>getter</h2>
+<ul>
+<li><code>String getName()</code>：ロギングやデバッグの目的のもので、レンダラーの名前を返します。レンダラーのクラスネームであることが一般的です。</li>
+<li><code>@C.TrackType int getTrackType()</code>：レンダラーがハンドリングしているトラックタイプを返します。</li>
+<li><code>RendererCapabilities getCapabilities()</code></li>
+<li><code>int getState()</code></li>
+<li>
+<p><code>MediaClock getMediaClock()</code></p>
+<p>もしレンダラーが自身の再生ポジションを越える場合にこのメソッドが対応するMediaClockを返します。もし MediaClockが帰ったならばプレイヤーはそのMediaClockを使います。<br>
+プレイヤーはこのメソッドから返された最低一つのレンダラーを持っているかもしれません。</p>
+</li>
+<li>
+<p><code>@Nullable SampleStream getStream()</code>：もしレンダラーがdisabledならばnullが帰ります。</p>
+</li>
+<li><code>long getReadingPositionUs()</code>：rendererが読み込んだサンプルの時間を返します。 <code>STATE_ENABLED</code> または <code>STATE_STARTED</code> の時に呼ばれます。</li>
+<li><code>boolean isCurrentStreamFinal()</code></li>
+<li>
+<p><code>boolean hasReadStreamToEnd()</code></p>
+<p>このメソッドは <code>STATE_ENABLED</code> または <code>STATE_STARTED</code> の時に呼ばれます。</p>
+</li>
+<li>
+<p><code>boolean isEnded()</code></p>
+</li>
+</ul>
+<h2>メソッド</h2>
+<ul>
+<li>
+<p><code>void init(int index, PlayerId playerId)</code></p>
+<p>プレイヤーが再生に使おうとしているレンダラーが初期化されます。indexはプレイヤーの中のレンダラーインデックスでPlayerIdはプレイヤーのIDです。</p>
+</li>
+<li>
+<p><code>void enable(RendererConfiguration configuration, Format[] formats, SampleStream stream, long positonUs, boolean joining, boolean mayRendererStartOfStream, long startPositionUs, long offsetUs)</code></p>
+<p>レンダラーに指定した SampleStreamを消費することを可能にします。このメソッドはレンダラーが <code>STATE_DISABLED</code> の時に呼ばれる可能性があります。
+- format：利用可能なフォーマット
+- positionUs：プレイヤーの現在のポジション
+- joining：レンダラーを再生中のものに合流するかどうか
+- mayRendererStartOfStream：レンダラーが <code>STATE_STARTED</code> 出なくてもレンダラーがストリームを開始することを許可するかどうか
+- startPositionUs：レンダラーの中の時間でのストリームの開始ポジション
+- offsetUs： SampleStreamから読み込まれたバッファのタイムスタンプにレンダリング前に追加されるオフセットを指定します。</p>
+</li>
+<li>
+<p><code>void start()</code></p>
+<p>レンダラーを開始します。<code>render()</code> を呼ぶことががレンダリングを開始することを意味しています。 <code>STATE_ENABLED</code> の場合に呼ばれます。</p>
+</li>
+<li>
+<p><code>void replaceStream(Format[] formats, SampleStream stream, long startPositionUs, long offsetUs)</code></p>
+<p>SampleStreamを交換します。 <code>STATE_ENABLED</code> と <code>STATE_STARTED</code> の場合に呼ばれます。</p>
+</li>
+<li>
+<p><code>void setCurrentStreamFinal()</code></p>
+</li>
+<li>
+<p><code>void maybeThrowStreamError() throws IOException</code></p>
+</li>
+<li>
+<p><code>void resetPosition(long positionUs)</code></p>
+<p>PositionDiscontinuityが発生したことをレンダラーに知らせます。レンダラーのサンプルストリームはキーフレームから再生をすることを保証します。<br>
+<code>STATE_ENABLED</code> と <code>STATE_STARTED</code> の場合に呼ばれます。</p>
+</li>
+<li>
+<p><code>default void setPlaybackSpeed(float currentPlaybackSpeed, float targetPlaybackSpeed)</code></p>
+<p>targetPlaybackSpeedは currentPlaybackSpeedとは異なります。</p>
+</li>
+<li>
+<p><code>void render(long positionUs, long elapsedRealtimeUs) throws ExoPlaybackException</code></p>
+<p>SampleStreamをインクリメンタルにレンダリングします。<br>
+レンダラーが{@link #STATE_ENABLED}の状態であれば、このメソッドを呼び出すたびにンダラーを起動したときに SampleStream をレンダリングできるようにするための作業を行います。もし レンダラーが STATE_STARTED の状態であれば、このメソッドを呼び出すと 指定されたメディアポジションに同期してSampleStreamを表示します。</p>
+<p>The renderer may also render the very start of the media at the current position (e.g. the
+first frame of a video stream) while still in the {@link #STATE_ENABLED} state, unless it's the
+initial start of the media after calling {@link #enable(RendererConfiguration, Format[],
+SampleStream, long, boolean, boolean, long, long)} with {@code mayRenderStartOfStream} set to
+{@code false}. （あまりにも長くて翻訳がだるい、DEEPLもダメだし。）</p>
+<p>このメソッドはすぐに返されるべきです。
+<code>STATE_ENABLED</code> と <code>STATE_STARTED</code> の場合に呼ばれます。</p>
+</li>
+<li>
+<p><code>boolean isReady()</code></p>
+<p>If the renderer is in the {@link #STATE_STARTED} state then returning true indicates that
+the renderer has everything that it needs to continue playback. Returning false indicates that
+the player should pause until the renderer is ready.</p>
+<p>If the renderer is in the {@link #STATE_ENABLED} state then returning true indicates that
+the renderer is ready for playback to be started. Returning false indicates that it is not.</p>
+</li>
+</ul>
+<p><code>STATE_ENABLED</code> と <code>STATE_STARTED</code> の場合に呼ばれます。</p>
+<ul>
+<li>
+<p><code>void stop()</code></p>
+<p><code>STATE_ENABLED</code>へ移行します
+<code>STATE_STARTED</code> の場合に呼ばれます。</p>
+</li>
+<li>
+<p><code>void disabled()</code></p>
+</li>
+</ul>
+<p><code>STATE_ENABLED</code> の場合に呼ばれます。</p>
+<ul>
+<li>
+<p><code>reset()</code></p>
+<p><code>STATE_DISABLED</code>の場合に呼ばれます。</p>
+</li>
+</ul>
+<h1>まとめ</h1>
+<p>render()メソッドの実実装と、getMediaClock()の実際の振る舞いが気になった。<br>
+例えば音ズレの問題は <code>getMediaClock()</code> が正しく振る舞えば起きないような気がする。</p>
+<p>長すぎて後半だるかった。</p>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>links</h2>
+                        <ul>
+                            <li><a href="https://getpelican.com/">Pelican</a></li>
+                            <li><a href="https://www.python.org/">Python.org</a></li>
+                            <li><a href="https://palletsprojects.com/p/jinja/">Jinja2</a></li>
+                            <li><a href="#">You can modify those links in your config file</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+                            <li><a href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="#">You can add links in your config file</a></li>
+                            <li><a href="#">Another social link</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a href="https://www.python.org/">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>

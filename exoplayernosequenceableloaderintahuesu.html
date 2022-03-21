@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="generator" content="Pelican" />
+        <title>ExoPlayerのSequenceableLoaderインターフェース</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="dev-platong's home Atom Feed" />
+        <meta name="description" content="Overview HlsSampleWrapperがimplementsしているので。 責務 他のローダーと同期的に進行可能なローダー。 基底 なし 空間 source インターフェース Callback void onContinueLoadingRequested …" />
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">dev-platong's home</a></h1>
+                <nav><ul>
+                    <li><a href="/pages/dev-platongs-home.html">dev-platong's home</a></li>
+                    <li class="active"><a href="/category/android-exoplayer.html">Android, ExoPlayer</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/exoplayernosequenceableloaderintahuesu.html" rel="bookmark"
+           title="Permalink to ExoPlayerのSequenceableLoaderインターフェース">ExoPlayerのSequenceableLoaderインターフェース</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2023-03-07T00:00:00+09:00">
+                Published: 火 07 3月 2023
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/dev-platong.html">dev-platong</a>
+        </address>
+<p>In <a href="/category/android-exoplayer.html">Android, ExoPlayer</a>.</p>
+
+</footer><!-- /.post-info -->      <h1>Overview</h1>
+<p>HlsSampleWrapperがimplementsしているので。</p>
+<h2>責務</h2>
+<p>他のローダーと同期的に進行可能なローダー。</p>
+<h2>基底</h2>
+<p>なし</p>
+<h2>空間</h2>
+<p><code>source</code></p>
+<h1>インターフェース</h1>
+<h2>Callback<T extends SequencableLoader></h2>
+<p><code>void onContinueLoadingRequested(T source)</code></p>
+<p><code>continueLoading(long)</code>を呼ぶことを期待するコールバック。再生スレッドから呼ばれる。 </p>
+<h2>メソッド</h2>
+<p><code>long getBufferedPositionUs()</code>・<code>long getNextLoadPositionUs()</code>はそのまま。</p>
+<h3><code>boolean continueLoading(long positionUs)</code></h3>
+<p>継続的なローディングを試みます。<code>True</code>を返す場合には進行が得られたことを示し、 <code>getNextLoadPosition()</code> の値が呼び出し前と変わることを意味します。</p>
+<h3><code>boolean isLoading()</code></h3>
+<h3><code>void reevaluateBuffer(long positionUs)</code></h3>
+<p>異なる品質に変わったならばリバッファリングします。</p>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>links</h2>
+                        <ul>
+                            <li><a href="https://getpelican.com/">Pelican</a></li>
+                            <li><a href="https://www.python.org/">Python.org</a></li>
+                            <li><a href="https://palletsprojects.com/p/jinja/">Jinja2</a></li>
+                            <li><a href="#">You can modify those links in your config file</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+                            <li><a href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="#">You can add links in your config file</a></li>
+                            <li><a href="#">Another social link</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a href="https://www.python.org/">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>
