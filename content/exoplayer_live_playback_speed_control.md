@@ -1,12 +1,25 @@
 Title: Low Latency時に快適な再生：LivePlaybackSpeedControlの挙動を追う
 Date: 2023-2-25
-LastModified: 2023-2-26
+LastModified: 2023-4-11
 Category: Android, ExoPlayer
 Authors: dev-platong
 
+# Overview
+
+低遅延ストリームまたは使用を明示した場合の通常LIVEストリームにおいて、再生オフセットを移動させながら
+現在の解像度での再生を維持する遅延管理機構について扱います。
+
+## 2023/4/11追記
+
+ExoPlayer r2.17.0においてGoogleの意思決定により、r2.13.0から有効だった低遅延ではないLiveストリームでの本クラスの遅延管理はデフォルトで非有効となりました。 SEE: https://github.com/google/ExoPlayer/issues/9329
+
+再度本機能を低遅延ストリームではないLiveストリームで有効にするためには、 `MediaItem` のビルド時に `LiveConfiguration` を設定する必要があります。
+
+方法は https://exoplayer.dev/live-streaming.html#configuring-live-playback-parameters を参照ください。
+
 ## Live再生時にMediaに設定される LiveConfigurationクラス
 
-オフセットと再生速度のmin/maxが設定できる。オフセットに関してはターゲットも設定できる。
+オフセットと再生速度のmin/maxが設定できます。オフセットに関してはターゲットも設定できます。
 
 ## LivePlaybackSpeedControlインターフェース
 
