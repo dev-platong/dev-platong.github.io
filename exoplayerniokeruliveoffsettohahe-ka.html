@@ -4,10 +4,10 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="generator" content="Pelican" />
-        <title>ExoPlayerのBufferクラス</title>
+        <title>ExoPlayerにおけるLiveOffsetとは何か</title>
         <link rel="stylesheet" href="/theme/css/main.css" />
         <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="dev-platong's home Atom Feed" />
-        <meta name="description" content="Overview SampleStreamに渡されるDecoderInputBufferを掘っていく途中で基底となるBuffer抽象クラスを見ます。 責務 バッファとフラグの基底クラス。 フラ …" />
+        <meta name="description" content="Overview Live edgeとは何か 詳細 LiveOffsetは、 TARGET DURATION の3倍になる。 これはRFC8216（HLSのspec）で規定されている。SEE: HLS spec 4.4.3.8 HLSのTarget Durationはセグメン …" />
 </head>
 
 <body id="index" class="home">
@@ -23,14 +23,14 @@
   <article>
     <header>
       <h1 class="entry-title">
-        <a href="/exoplayernobufferkurasu.html" rel="bookmark"
-           title="Permalink to ExoPlayerのBufferクラス">ExoPlayerのBufferクラス</a></h1>
+        <a href="/exoplayerniokeruliveoffsettohahe-ka.html" rel="bookmark"
+           title="Permalink to ExoPlayerにおけるLiveOffsetとは何か">ExoPlayerにおけるLiveOffsetとは何か</a></h1>
     </header>
 
     <div class="entry-content">
 <footer class="post-info">
-        <abbr class="published" title="2023-03-09T00:00:00+09:00">
-                Published: 木 09 3月 2023
+        <abbr class="published" title="2023-02-25T00:00:00+09:00">
+                Published: 土 25 2月 2023
         </abbr>
 
         <address class="vcard author">
@@ -39,26 +39,23 @@
 <p>In <a href="/category/android-exoplayer.html">Android, ExoPlayer</a>.</p>
 
 </footer><!-- /.post-info -->      <h1>Overview</h1>
-<p>SampleStreamに渡されるDecoderInputBufferを掘っていく途中で基底となるBuffer抽象クラスを見ます。</p>
-<h1>責務</h1>
-<p>バッファとフラグの基底クラス。</p>
-<h2>フラグの6種類</h2>
+<p>Live edgeとは何か</p>
+<h1>詳細</h1>
+<p>LiveOffsetは、 <code>TARGET DURATION</code> の3倍になる。</p>
+<p>これはRFC8216（HLSのspec）で規定されている。SEE: <a href="https://datatracker.ietf.org/doc/html/draft-pantos-hls-rfc8216bis-09#:~:text=Its%20absence%20implies%20a%20value%20of%20three%0A%20%20%20%20%20%20times%20the%20Target%20Duration.">HLS spec 4.4.3.8</a></p>
+<p>HLSのTarget Durationは<a href="https://gnzo.com/labo/archives/646#:~:text=The%20EXT-X-TARGETDURATION,%E9%81%A9%E7%94%A8%E3%81%95%E3%82%8C%E3%81%BE%E3%81%99%E3%80%82">セグメントの最大長（ただし、小数点以下は四捨五入）になる</a>ため、セグメントX個分というわけではなく、最低でもセグメント3つ分ということになる。</p>
 <ul>
-<li>KEY_FRAME：バッファが同期サンプルを持っていることを示す。</li>
-<li>END_OF_STREAM：EOSのシグナルとなるからのバッファであることを示す。</li>
-<li>HAS_SUPPLEMENTAL_DATA：バッファが補完的なデータを持っていることを示す。</li>
-<li>LAST_SAMPLE：ストリームの最後のメディアサンプルであることを知られているものを含んでいることを示す。</li>
-<li>ENCRYPTED：バッファが一部または全て暗号化されている。</li>
-<li>DECODE_ONLY：レンダリングされないものを示す。</li>
+<li>EXT-X-START：EXT-X-STARTタグは、プレイリストの再生を開始する優先ポイントを示します。デフォルトでは、クライアントは再生セッションを開始するときにこの時点で再生を開始する必要があります。このタグはオプションです。</li>
 </ul>
-<p><a href="https://github.com/google/ExoPlayer/blob/r2.17.0/library%2Fcommon%2Fsrc%2Fmain%2Fjava%2Fcom%2Fgoogle%2Fandroid%2Fexoplayer2%2FC.java#L480-L510">C.java#L480-L510</a></p>
-<p><a href="https://github.com/google/ExoPlayer/blob/r2.17.0/library/decoder/src/main/java/com/google/android/exoplayer2/decoder/Buffer.java">Buffer.java</a></p>
-<h2>振る舞い</h2>
-<p>Bufferクラスでは主にフラグの扱いを定義している。<br>
-持っているフラグから、 <code>isDecodeOnly</code> かなどを判定しているだけ。<br>
-フラグはset/add/clearできる。</p>
-<h1>まとめ</h1>
-<p>フラグについての振る舞いしか定義されていない。フラグは6つある。</p>
+<p><code>durations - startOffsetUs</code> </p>
+<p>もし、ない場合 <code>partHoldBackUs</code> （サーバーサイドのレコメンド） The server-recommended live offset in microseconds in low-latency mode, or {@link C#TIME_UNSET} if none defined.  </p>
+<h2>holdBackUsが存在する場合 &amp; part target durationがある場合</h2>
+<p>The server-recommended live offset in microseconds in low-latency mode, or {@link * C#TIME_UNSET} if none defined.</p>
+<p>低遅延モードを持ってる。</p>
+<h2>holdBackUs</h2>
+<p>The server-recommended live offset in microseconds, or {@link C#TIME_UNSET} if none defined.</p>
+<h2>RFCに基づく決定</h2>
+<p>Fallback, see RFC 8216, Section 4.4.3.8.</p>
     </div><!-- /.entry-content -->
 
   </article>
