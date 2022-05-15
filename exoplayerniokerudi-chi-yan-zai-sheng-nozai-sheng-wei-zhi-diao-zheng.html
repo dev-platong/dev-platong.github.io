@@ -7,6 +7,7 @@
         <title>ExoPlayerにおける低遅延再生の再生位置調整</title>
         <link rel="stylesheet" href="/theme/css/main.css" />
         <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="dev-platong's home Atom Feed" />
+        <meta name="description" content="Overview ExoPlayerにおける低遅延サポートについて、再生位置調整機能だけが低遅延に特有であると仮定してその詳細をまとめ …" />
 </head>
 
 <body id="index" class="home">
@@ -14,14 +15,30 @@
                 <h1><a href="/">dev-platong's home</a></h1>
                 <nav><ul>
                     <li><a href="/pages/dev-platongs-home.html">dev-platong's home</a></li>
-                    <li class="active"><a href="/pages/exoplayerniokerudi-chi-yan-zai-sheng-nozai-sheng-wei-zhi-diao-zheng.html">ExoPlayerにおける低遅延再生の再生位置調整</a></li>
                     <li><a href="/category/android-exoplayer.html">Android, ExoPlayer</a></li>
+                    <li class="active"><a href="/category/android-exoplayer-low-latency-ll-hls.html">Android, ExoPlayer, Low-Latency, LL-hls</a></li>
                 </ul></nav>
         </header><!-- /#banner -->
 <section id="content" class="body">
-    <h1 class="entry-title">ExoPlayerにおける低遅延再生の再生位置調整</h1>
-    
-    <h1>Overview</h1>
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/exoplayerniokerudi-chi-yan-zai-sheng-nozai-sheng-wei-zhi-diao-zheng.html" rel="bookmark"
+           title="Permalink to ExoPlayerにおける低遅延再生の再生位置調整">ExoPlayerにおける低遅延再生の再生位置調整</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2023-05-15T00:00:00+09:00">
+                Published: 月 15 5月 2023
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/dev-platong.html">dev-platong</a>
+        </address>
+<p>In <a href="/category/android-exoplayer-low-latency-ll-hls.html">Android, ExoPlayer, Low-Latency, LL-hls</a>.</p>
+
+</footer><!-- /.post-info -->      <h1>Overview</h1>
 <p>ExoPlayerにおける低遅延サポートについて、再生位置調整機能だけが低遅延に特有であると仮定してその詳細をまとめます。
 <code>DefaultLivePlaybackSpeedControl</code> が最も関係する実クラスで、過去の計算結果を考慮する緩やかな変化を再生速度とライブオフセットに加える設計になっています。</p>
 <h1>前提</h1>
@@ -197,45 +214,36 @@ long safeOffsetUs =
 <p>currentTargetOffsetがsafeOffsetより長いかを判断して処理を分岐させます。</p>
 <p><code>if (currentTargetLiveOffsetUs &gt; safeOffsetUs) {</code></p>
 </li>
+<li>
+<p>（safeOffsetよりcurrentTargetLiveOffsetが大きい場合）度を超えて安全なのでcurrentTargetLifeOffsetを縮小します。</p>
+<p>maxDecrementUsの計算方法については、すみませんいまいちよくわかりません。</p>
+<p>おそらく、 <code>minUpdateIntervalUs</code> を掛けているのは、値が大きくなると更新頻度が落ちるので、それを考慮して一回あたりの影響を上げるためだと思います。</p>
+<p><code>// There is room for decreasing the target offset towards the ideal or safe offset (whichever
+  // is larger). We want to limit the decrease so that the playback speed delta we achieve is
+  // the same as the maximum delta when slowing down towards the target.
+  long minUpdateIntervalUs = Util.msToUs(minUpdateIntervalMs);
+  long decrementToOffsetCurrentSpeedUs =
+      (long) ((adjustedPlaybackSpeed - 1f) * minUpdateIntervalUs);
+  long decrementToIncreaseSpeedUs = (long) ((maxPlaybackSpeed - 1f) * minUpdateIntervalUs);
+  long maxDecrementUs = decrementToOffsetCurrentSpeedUs + decrementToIncreaseSpeedUs;
+  currentTargetLiveOffsetUs =
+      max(safeOffsetUs, idealTargetLiveOffsetUs, currentTargetLiveOffsetUs - maxDecrementUs);</code></p>
+</li>
+<li>
+<p>（safeOffsetよりcurrentTargetLiveOffsetが小さい場合）速度を落とした時に目指すべきtargetOffsetを計算します。</p>
+<p>考察：調整済み速度が1倍を下回る場合、目指すべきオフセットは <code>liveOffset</code> （本メソッドの引数に渡されているOffset）です。 <code>proportionalControlFactor</code> で割る理由は、速度変化が <code>proportionalControlFactor</code> に影響を受けて現在の状況が減らされて反映されるため、それを元に戻すためだと推察されます。</p>
+<p><code>// We'd like to reach a stable condition where the current live offset stays just below the
+  // safe offset. But don't increase the target offset to more than what would allow us to slow
+  // down gradually from the current offset.
+  long offsetWhenSlowingDownNowUs =
+      liveOffsetUs - (long) (max(0f, adjustedPlaybackSpeed - 1f) / proportionalControlFactor);</code></p>
+</li>
+<li>
+<p><code>currentTargetLiveOffset</code> と <code>safeOffset</code> の間に先ほど計算した <code>offsetWhenSlowingDownNowUs</code> があるならばそれを採用します。</p>
+<p><code>currentTargetLiveOffsetUs =
+      Util.constrainValue(offsetWhenSlowingDownNowUs, currentTargetLiveOffsetUs, safeOffsetUs);</code></p>
+</li>
 </ol>
-<p>3-1. （safeOffsetよりcurrentTargetLiveOffsetが大きい場合）度を超えて安全なのでcurrentTargetLifeOffsetを縮小します。</p>
-<div class="highlight"><pre><span></span><code><span class="n">maxDecrementUsの計算方法については、すみませんいまいちよくわかりません。</span><span class="w"></span>
-
-<span class="n">おそらく、</span><span class="w"> </span><span class="n n-Quoted">`minUpdateIntervalUs`</span><span class="w"> </span><span class="n">を掛けているのは、値が大きくなると更新頻度が落ちるので、それを考慮して一回あたりの影響を上げるためだと思います。</span><span class="w"></span>
-
-<span class="n n-Quoted">`</span><span class="n n-Quoted n-Quoted-Escape">``</span><span class="n n-Quoted"></span>
-<span class="n n-Quoted">  // There is room for decreasing the target offset towards the ideal or safe offset (whichever</span>
-<span class="n n-Quoted">  // is larger). We want to limit the decrease so that the playback speed delta we achieve is</span>
-<span class="n n-Quoted">  // the same as the maximum delta when slowing down towards the target.</span>
-<span class="n n-Quoted">  long minUpdateIntervalUs = Util.msToUs(minUpdateIntervalMs);</span>
-<span class="n n-Quoted">  long decrementToOffsetCurrentSpeedUs =</span>
-<span class="n n-Quoted">      (long) ((adjustedPlaybackSpeed - 1f) * minUpdateIntervalUs);</span>
-<span class="n n-Quoted">  long decrementToIncreaseSpeedUs = (long) ((maxPlaybackSpeed - 1f) * minUpdateIntervalUs);</span>
-<span class="n n-Quoted">  long maxDecrementUs = decrementToOffsetCurrentSpeedUs + decrementToIncreaseSpeedUs;</span>
-<span class="n n-Quoted">  currentTargetLiveOffsetUs =</span>
-<span class="n n-Quoted">      max(safeOffsetUs, idealTargetLiveOffsetUs, currentTargetLiveOffsetUs - maxDecrementUs);</span>
-<span class="n n-Quoted n-Quoted-Escape">``</span><span class="n n-Quoted">`</span><span class="w"></span>
-</code></pre></div>
-
-<p>4-1. （safeOffsetよりcurrentTargetLiveOffsetが小さい場合）速度を落とした時に目指すべきtargetOffsetを計算します。</p>
-<div class="highlight"><pre><span></span><code><span class="n">考察：調整済み速度が1倍を下回る場合、目指すべきオフセットは</span><span class="w"> </span><span class="n n-Quoted">`liveOffset`</span><span class="w"> </span><span class="n">（本メソッドの引数に渡されているOffset）です。</span><span class="w"> </span><span class="n n-Quoted">`proportionalControlFactor`</span><span class="w"> </span><span class="n">で割る理由は、速度変化が</span><span class="w"> </span><span class="n n-Quoted">`proportionalControlFactor`</span><span class="w"> </span><span class="n">に影響を受けて現在の状況が減らされて反映されるため、それを元に戻すためだと推察されます。</span><span class="w"></span>
-
-<span class="n n-Quoted">`</span><span class="n n-Quoted n-Quoted-Escape">``</span><span class="n n-Quoted"></span>
-<span class="n n-Quoted">// We&#39;d like to reach a stable condition where the current live offset stays just below the</span>
-<span class="n n-Quoted">  // safe offset. But don&#39;t increase the target offset to more than what would allow us to slow</span>
-<span class="n n-Quoted">  // down gradually from the current offset.</span>
-<span class="n n-Quoted">  long offsetWhenSlowingDownNowUs =</span>
-<span class="n n-Quoted">      liveOffsetUs - (long) (max(0f, adjustedPlaybackSpeed - 1f) / proportionalControlFactor);</span>
-<span class="n n-Quoted n-Quoted-Escape">``</span><span class="n n-Quoted">`</span><span class="w"></span>
-</code></pre></div>
-
-<p>4-2. <code>currentTargetLiveOffset</code> と <code>safeOffset</code> の間に先ほど計算した <code>offsetWhenSlowingDownNowUs</code> があるならばそれを採用します。</p>
-<div class="highlight"><pre><span></span><code><span class="err">```</span><span class="w"></span>
-<span class="n">currentTargetLiveOffsetUs</span><span class="w"> </span><span class="o">=</span><span class="w"></span>
-<span class="w">      </span><span class="n">Util</span><span class="o">.</span><span class="n">constrainValue</span><span class="p">(</span><span class="n">offsetWhenSlowingDownNowUs</span><span class="p">,</span><span class="w"> </span><span class="n">currentTargetLiveOffsetUs</span><span class="p">,</span><span class="w"> </span><span class="n">safeOffsetUs</span><span class="p">);</span><span class="w"></span>
-<span class="err">```</span><span class="w"></span>
-</code></pre></div>
-
 <p><a href="https://github.com/google/ExoPlayer/blob/r2.17.1/library/core/src/main/java/com/google/android/exoplayer2/DefaultLivePlaybackSpeedControl.java#L417-L445">DefaultLivePlaybackSpeedControl.java#L417-L445</a></p>
 <h3>速度調整</h3>
 <p>liveOffsetとバッファの長さを渡す必要があります。</p>
@@ -295,6 +303,9 @@ return adjustedPlaybackSpeed;</code></p>
 </code></pre></div>
 
 <p><a href="https://github.com/google/ExoPlayer/blob/r2.17.1/library/core/src/main/java/com/google/android/exoplayer2/DefaultLivePlaybackSpeedControl.java#L324-L335">DefaultLivePlaybackSpeedControl.java#L324-L335</a></p>
+    </div><!-- /.entry-content -->
+
+  </article>
 </section>
         <section id="extras" class="body">
                 <div class="blogroll">
