@@ -1,7 +1,7 @@
 Title: ExoPlayerにおける低遅延再生の再生位置調整
-Date: 2023-5-15
-LastModified: 2023-5-16
-Category: Android, ExoPlayer, Low-Latency, LL-hls
+Date: 2022-5-15
+LastModified: 2022-5-16
+Category: ExoPlayer
 Authors: dev-platong
 
 # Overview
@@ -25,13 +25,7 @@ r2.17.1
 
     Playerを構成する際にビルダーに共通のライブ再生に関する位置調整のパラメータを設定するか、MediaItem毎に設定するかという2つの手段があります。
 
-# LiveOffset
-
-LiveOffsetは、現在の時刻から再生位置が何秒遅れているかを示します。
-
-<img src="../images/getLiveOffsetUs.jpg" alt="ExoPlayerImplInternal Line 1108 getLiveOffsetUs function"/>
-
-[ExoPlayerImplInternal.java#L1114-L1115](https://github.com/google/ExoPlayer/blob/r2.17.1/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L1114-L1115)
+- [LiveOffsetとは何か](./liveoffset.md)
 
 # 再生位置調整機能
 
