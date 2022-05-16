@@ -243,7 +243,7 @@ private static long smooth(long smoothedValue, long newValue, float smoothingFac
     if (currentTargetLiveOffsetUs > safeOffsetUs) {
     ```
 
-3-1. （safeOffsetよりcurrentTargetLiveOffsetが大きい場合）度を超えて安全なのでcurrentTargetLifeOffsetを縮小します。
+3. （safeOffsetよりcurrentTargetLiveOffsetが大きい場合）度を超えて安全なのでcurrentTargetLifeOffsetを縮小します。
 
     maxDecrementUsの計算方法については、すみませんいまいちよくわかりません。
 
@@ -262,7 +262,7 @@ private static long smooth(long smoothedValue, long newValue, float smoothingFac
           max(safeOffsetUs, idealTargetLiveOffsetUs, currentTargetLiveOffsetUs - maxDecrementUs);
     ```
 
-4-1. （safeOffsetよりcurrentTargetLiveOffsetが小さい場合）速度を落とした時に目指すべきtargetOffsetを計算します。
+4. （safeOffsetよりcurrentTargetLiveOffsetが小さい場合）速度を落とした時に目指すべきtargetOffsetを計算します。
 
     考察：調整済み速度が1倍を下回る場合、目指すべきオフセットは `liveOffset` （本メソッドの引数に渡されているOffset）です。 `proportionalControlFactor` で割る理由は、速度変化が `proportionalControlFactor` に影響を受けて現在の状況が減らされて反映されるため、それを元に戻すためだと推察されます。
 
@@ -274,7 +274,7 @@ private static long smooth(long smoothedValue, long newValue, float smoothingFac
           liveOffsetUs - (long) (max(0f, adjustedPlaybackSpeed - 1f) / proportionalControlFactor);
     ```
 
-4-2. `currentTargetLiveOffset` と `safeOffset` の間に先ほど計算した `offsetWhenSlowingDownNowUs` があるならばそれを採用します。
+5. `currentTargetLiveOffset` と `safeOffset` の間に先ほど計算した `offsetWhenSlowingDownNowUs` があるならばそれを採用します。
 
     ```
     currentTargetLiveOffsetUs =
