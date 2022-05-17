@@ -1,7 +1,7 @@
 Title: ExoPlayerのsetMediaItemを読んだ時
 Date: 2023-2-28
 LastModified: 2023-3-7
-Category: Android, ExoPlayer
+Category: ExoPlayer
 Authors: dev-platong
 
 ## ExoPlayer.setMediaItemを呼びます。

@@ -1,7 +1,7 @@
 Title: ExoPlayerのFormatクラス
 Date: 2023-3-9
 LastModified: 2023-3-9
-Category: Android, ExoPlayer
+Category: ExoPlayer
 Authors: dev-platong
 
 # 概要

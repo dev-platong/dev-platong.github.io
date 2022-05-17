@@ -1,7 +1,7 @@
 Title: ExoPlayerのSampleStreamインターフェース
 Date: 2023-3-7
 LastModified: 2023-3-10
-Category: Android, ExoPlayer
+Category: ExoPlayer
 Authors: dev-platong
 
 # 概要

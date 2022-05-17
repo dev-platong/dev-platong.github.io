@@ -1,7 +1,7 @@
 Title: ExoPlayerのSequenceableLoaderインターフェース
 Date: 2023-3-7
 LastModified: 2023-3-11
-Category: Android, ExoPlayer
+Category: ExoPlayer
 Authors: dev-platong
 
 # Overview

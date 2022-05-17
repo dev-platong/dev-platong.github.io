@@ -1,6 +1,6 @@
 Title: ExoPlayerが生成される時、具体的にはどんなクラスが生成されるのか
 Date: 2023-2-23
-Category: Android, ExoPlayer
+Category: ExoPlayer
 Authors: dev-platong
 
 ## 概要

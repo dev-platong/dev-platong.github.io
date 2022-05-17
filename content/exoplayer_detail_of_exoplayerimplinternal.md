@@ -1,6 +1,6 @@
 Title: ExoPlayerImplInternalの挙動を追う（生成まわり）
 Date: 2023-2-24
-Category: Android, ExoPlayer
+Category: ExoPlayer
 Authors: dev-platong
 
 ## ExoPlayerImplInternalの生成時

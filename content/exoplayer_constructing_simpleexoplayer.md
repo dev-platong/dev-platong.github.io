@@ -1,7 +1,7 @@
 Title: SimpleExoPlayerの生成時
 Date: 2023-2-27
 LastModified: 2023-2-28
-Category: Android, ExoPlayer
+Category: ExoPlayer
 Authors: dev-platong
 
 ## Constructing時に関連するクラス・プロパティ

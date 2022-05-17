@@ -1,7 +1,7 @@
 Title: ExoPlayerのDecoderInputBufferクラス
 Date: 2023-3-9
 LastModified: 2023-3-10
-Category: Android, ExoPlayer
+Category: ExoPlayer
 Authors: dev-platong
 
 # Overview

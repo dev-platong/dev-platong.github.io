@@ -1,7 +1,7 @@
 Title: ExoPlayerのLoaderファイナルクラス
 Date: 2023-3-10
 LastModified: 2023-3-10
-Category: Android, ExoPlayer
+Category: ExoPlayer
 Authors: dev-platong
 
 # Overview

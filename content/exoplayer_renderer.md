@@ -1,7 +1,7 @@
 Title: ExoPlayerのRendererインターフェース
 Date: 2022-3-9
 LastModified: 2022-3-10
-Category: Android, ExoPlayer
+Category: ExoPlayer
 Authors: dev-platong
 
 # Overview
