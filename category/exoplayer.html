@@ -14,17 +14,16 @@
                 <h1><a href="/">dev-platong's home</a></h1>
                 <nav><ul>
                     <li><a href="/pages/dev-platongs-home.html">dev-platong's home</a></li>
-                    <li><a href="/category/android-exoplayer.html">Android, ExoPlayer</a></li>
                     <li class="active"><a href="/category/exoplayer.html">ExoPlayer</a></li>
                 </ul></nav>
         </header><!-- /#banner -->
 
             <aside id="featured" class="body">
                 <article>
-                    <h1 class="entry-title"><a href="/exoplayerniokerudi-chi-yan-zai-sheng-nozai-sheng-wei-zhi-diao-zheng.html">ExoPlayerにおける低遅延再生の再生位置調整</a></h1>
+                    <h1 class="entry-title"><a href="/exoplayernoloaderhuainarukurasu.html">ExoPlayerのLoaderファイナルクラス</a></h1>
 <footer class="post-info">
-        <abbr class="published" title="2022-05-15T00:00:00+09:00">
-                Published: 日 15 5月 2022
+        <abbr class="published" title="2023-03-10T00:00:00+09:00">
+                Published: 金 10 3月 2023
         </abbr>
 
         <address class="vcard author">
@@ -33,273 +32,26 @@
 <p>In <a href="/category/exoplayer.html">ExoPlayer</a>.</p>
 
 </footer><!-- /.post-info --><h1>Overview</h1>
-<p>ExoPlayerにおける低遅延サポートについて、再生位置調整機能だけが低遅延に特有であると仮定してその詳細をまとめます。
-<code>DefaultLivePlaybackSpeedControl</code> が最も関係する実クラスで、バッファの状態を考慮し、過去の計算結果を考慮する緩やかな変化を再生速度とライブオフセットに加える設計になっています。</p>
-<h1>前提</h1>
-<h2>使用バージョン</h2>
-<p>r2.17.1</p>
-<h2>前提知識</h2>
+<p>HlsSampleStreamWrapperを見ていたら、出てきたので軽めに触れる。</p>
+<h2>責務</h2>
+<p>Loadableインターフェースを持つもののバックグラウンドでの管理。</p>
+<h2>基底</h2>
+<p>LoaderErrorThrower：条件によって例外をスローするか判断する <code>maybeThrowError()</code>を持つ。</p>
+<h2>空間</h2>
+<p><code>upstream</code> 空間</p>
+<h1>定義クラス・例外・インターフェース</h1>
+<h2>例外：UnexpectedLoaderException</h2>
+<p>IOExceptionの拡張。特別な機能は持たない。</p>
+<h1>インターフェース：Loadable</h1>
+<h2>責務</h2>
+<p>Loaderによってloadされるオブジェクト</p>
+<p><code>cancelLoad()</code> メソッドと <code>load()</code> メソッドを持つ。</p>
+<h2>インターフェース；Callback(T extends Loadable)</h2>
 <ul>
-<li>
-<p><a href="https://exoplayer.dev/doc/reference/com/google/android/exoplayer2/MediaItem.LiveConfiguration.html">MediaItem.LiveConfiguration</a>に設定できるパラメータ</p>
-<p>オフセットと再生速度でMin/Maxを設定できます。オフセットのみターゲットオフセットも設定します。</p>
-</li>
-<li>
-<p><a href="https://github.com/google/ExoPlayer/blob/r2.17.1/docs/live-streaming.md">exoplayer.devのLiveStreamingのdocs</a></p>
-<p>Playerを構成する際にビルダーに共通のライブ再生に関する位置調整のパラメータを設定するか、MediaItem毎に設定するかという2つの手段があります。</p>
-</li>
-<li>
-<p><a href="./liveoffset.md">LiveOffsetとは何か</a></p>
-</li>
-</ul>
-<h1>再生位置調整機能</h1>
-<p>ExoPlayerではインターフェースがまず提供されていて、そのデフォルト実装があるというコードベース全体の慣習があります。</p>
-<p>再生位置調整機能に該当するのは、 <code>LivePlaybackSpeedControl</code> インターフェースと <code>DefaultLivePlaybackSpeedControl</code> クラスになります。</p>
-<p>再生位置調整機能は、低遅延ストリームで通常で有効です。低遅延ではないライブストリームでは明治的に再生速度のMAX/MINを指定することで有効になります。 SEE: <a href="https://github.com/google/ExoPlayer/releases/tag/r2.17.0#:~:text=Disable%20automatic%20speed%20adjustment%20for%20live%20streams%20that%20neither%20have%20low%2Dlatency%20features%20nor%20a%20user%20request%20setting%20the%20speed">r2.17.0 release note</a></p>
-<p>注意： r2.13.0~2.16.1 では低遅延ではないライブストリームでも再生位置調整機能がデフォルトで有効でした。 SEE：https://github.com/google/ExoPlayer/issues/9329</p>
-<h2>LivePlaybackSpeedControl インターフェース</h2>
-<p>5つのメソッドがあります。</p>
-<h3>void setLiveConfiguration(LiveConfiguration liveConfiguration)</h3>
-<p><code>MediaItem</code> から渡ってくる <code>LiveConfiguration</code> のセッター。</p>
-<div class="highlight"><pre><span></span><code><span class="w">  </span><span class="cm">/**</span>
-<span class="cm">   * Sets the live configuration defined by the media.</span>
-<span class="cm">   *</span>
-<span class="cm">   * @param liveConfiguration The {@link LiveConfiguration} as defined by the media.</span>
-<span class="cm">   */</span><span class="w"></span>
-<span class="w">  </span><span class="n">void</span><span class="w"> </span><span class="n">setLiveConfiguration</span><span class="p">(</span><span class="n">LiveConfiguration</span><span class="w"> </span><span class="n">liveConfiguration</span><span class="p">);</span><span class="w"></span>
-</code></pre></div>
-
-<p><a href="https://github.com/google/ExoPlayer/blob/r2.17.1/library/core/src/main/java/com/google/android/exoplayer2/LivePlaybackSpeedControl.java#L26-L31">LivePlaybackSpeedControl.java#L26-L31</a></p>
-<h3>void setTargetLiveOffsetOverrideUs(long liveOffsetUs)</h3>
-<p><code>LiveConfiguration</code> 経由で targetLiveOffset が設定されている場合に targetLiveOffsetをオーバーライドするメソッドです。</p>
-<div class="highlight"><pre><span></span><code><span class="cm">/**</span>
-<span class="cm">   * Sets the target live offset in microseconds that overrides the live offset {@link</span>
-<span class="cm">   * #setLiveConfiguration configured} by the media. Passing {@code C.TIME_UNSET} deletes a previous</span>
-<span class="cm">   * override.</span>
-<span class="cm">   *</span>
-<span class="cm">   * &lt;p&gt;If no target live offset is configured by {@link #setLiveConfiguration}, this override has</span>
-<span class="cm">   * no effect.</span>
-<span class="cm">   */</span><span class="w"></span>
-<span class="w">  </span><span class="n">void</span><span class="w"> </span><span class="n">setTargetLiveOffsetOverrideUs</span><span class="p">(</span><span class="n">long</span><span class="w"> </span><span class="n">liveOffsetUs</span><span class="p">);</span><span class="w"></span>
-</code></pre></div>
-
-<p><a href="https://github.com/google/ExoPlayer/blob/r2.17.1/library/core/src/main/java/com/google/android/exoplayer2/LivePlaybackSpeedControl.java#L33-L41">LivePlaybackSpeedControl.java#L33-L41</a></p>
-<h3>void notifyRebuffer()</h3>
-<p>ユーザーインタラクションではなくバッファの不足によるリバッファリングを通知します。ただし、最初のバッファリングとシークによるバッファリング時にはこのメソッドは呼び出されません。</p>
-<div class="highlight"><pre><span></span><code>  /**
-   * Notifies the live playback speed control that a rebuffer occurred.
-   *
-   * &lt;p&gt;A rebuffer is defined to be caused by buffer depletion rather than a user action. Hence this
-   * method is not called during initial buffering or when buffering as a result of a seek
-   * operation.
-   */
-  void notifyRebuffer();
-</code></pre></div>
-
-<p><a href="https://github.com/google/ExoPlayer/blob/r2.17.1/library/core/src/main/java/com/google/android/exoplayer2/LivePlaybackSpeedControl.java#L43-L50">LivePlaybackSpeedControl.java#L43-L50</a></p>
-<h3>float getAdjustedPlaybackSpeed(long liveOffsetUs, long bufferedDurationUs)</h3>
-<p>現在のオフセット位置とバッファ位置を渡すことで、調整済み速度を返します。</p>
-<div class="highlight"><pre><span></span><code><span class="w">  </span><span class="cm">/**</span>
-<span class="cm">   * Returns the adjusted playback speed in order get closer towards the {@link</span>
-<span class="cm">   * #getTargetLiveOffsetUs() target live offset}.</span>
-<span class="cm">   *</span>
-<span class="cm">   * @param liveOffsetUs The current live offset, in microseconds.</span>
-<span class="cm">   * @param bufferedDurationUs The duration of media that&#39;s currently buffered, in microseconds.</span>
-<span class="cm">   * @return The adjusted factor by which playback should be sped up.</span>
-<span class="cm">   */</span><span class="w"></span>
-<span class="w">  </span><span class="nc">float</span><span class="w"> </span><span class="n">getAdjustedPlaybackSpeed</span><span class="p">(</span><span class="n">long</span><span class="w"> </span><span class="n">liveOffsetUs</span><span class="p">,</span><span class="w"> </span><span class="n">long</span><span class="w"> </span><span class="n">bufferedDurationUs</span><span class="p">);</span><span class="w"></span>
-</code></pre></div>
-
-<p><a href="https://github.com/google/ExoPlayer/blob/r2.17.1/library/core/src/main/java/com/google/android/exoplayer2/LivePlaybackSpeedControl.java#L52-L60">LivePlaybackSpeedControl.java#L52-L60</a></p>
-<h3>long getTargetLiveOffsetUs()</h3>
-<p>現在のターゲットオフセットを返します。この値は初めにMediaItemから渡された値ではなく、調整を続けて変動した値になります。</p>
-<div class="highlight"><pre><span></span><code><span class="w">  </span><span class="cm">/**</span>
-<span class="cm">   * Returns the current target live offset, in microseconds, or {@link C#TIME_UNSET} if no target</span>
-<span class="cm">   * live offset is defined for the current media.</span>
-<span class="cm">   */</span><span class="w"></span>
-<span class="w">  </span><span class="n">long</span><span class="w"> </span><span class="n">getTargetLiveOffsetUs</span><span class="p">();</span><span class="w"></span>
-</code></pre></div>
-
-<p><a href="https://github.com/google/ExoPlayer/blob/r2.17.1/library/core/src/main/java/com/google/android/exoplayer2/LivePlaybackSpeedControl.java#L62-L66">LivePlaybackSpeedControl.java#L62-L66</a></p>
-<h2>DefaultLivePlaybackSpeedControl クラス</h2>
-<p>以下の解説は全てデフォルト値を使用する場合です。
-先にprivateメソッドを解説し、それを利用する <code>LivePlaybackSpeedControl</code> インターフェースの振る舞いを追います。</p>
-<h3>初期値</h3>
-<ul>
-<li>fallbackMinPlaybackSpeed：0.97</li>
-<li>fallbackMaxPlaybackSpeed: 1.03</li>
-<li>minUpdateIntervalMs：1_000</li>
-<li>smoothedMinPossibleLiveOffsetUs：<code>C.TIME_UNSET</code></li>
-<li>smoothedMinPossibleLiveOffsetDeviationUs：<code>C.TIME_UNSET</code></li>
-</ul>
-<h3>targetLiveOffsetを必要ならばリセットする</h3>
-<p>内部の振る舞いです（privateメソッド）。</p>
-<p>idealTargetOffsetの値を更新します。<br>
-優先順位は、<code>mediaConfigurationTargetLiveOffsetUs &lt; targetLiveOffsetOverrideUs</code> となります。</p>
-<p>以前と同じ <code>idealTargetOffset</code> の値で上書きはせず、アーリーリターンします。</p>
-<p>このことから、 MediaItem経由のLiveConfigurationのtargetOffsetではなく、<code>targetLiveOffsetOverrideUs</code>が途中で設定された場合などに実際の更新処理が実行されることが推測できます。</p>
-<p>更新処理は以下の通りです。以前の値を考慮する計算になっているため、targetLiveOffsetの計算に利用される「以前のデータ」をクリアし、内部の状態を1度目の計算に適する形に戻します。</p>
-<div class="highlight"><pre><span></span><code>idealTargetLiveOffsetUs = idealOffsetUs;
-currentTargetLiveOffsetUs = idealOffsetUs;
-smoothedMinPossibleLiveOffsetUs = C.TIME_UNSET;
-smoothedMinPossibleLiveOffsetDeviationUs = C.TIME_UNSET;
-lastPlaybackSpeedUpdateMs = C.TIME_UNSET;
-</code></pre></div>
-
-<p><a href="https://github.com/google/ExoPlayer/blob/r2.17.1/library/core/src/main/java/com/google/android/exoplayer2/DefaultLivePlaybackSpeedControl.java#L385-L389">DefaultLivePlaybackSpeedControl.java#L385-L389</a></p>
-<p><code>LivePlaybackSpeedControl</code> インターフェースで定義される <code>setLiveConfiguration</code> か <code>setTargetLiveOffsetOverrideUs</code> で使用されます。</p>
-<h3>線形平滑化（smooth)</h3>
-<p>値を急激ではなく滑らかに変更するための著名なアルゴリズムです。変化前の値と変化後の値を割合で足し合わせます（金魚の水槽の水を全ては変えず半分だけ変えるみたいなことです）。</p>
-<p>この時の足し合わせる割合は <code>smoothingFactor</code> です。本クラスでは、LiveOffsetを最小にする場合、つまり最も攻めたLiveOffsetを計算する場合に利用され、デフォルト値は <code>0.999f</code> です。SEE: <a href="https://github.com/google/ExoPlayer/blob/r2.17.1/library/core/src/main/java/com/google/android/exoplayer2/DefaultLivePlaybackSpeedControl.java#L80-L84">DefaultLivePlaybackSpeedControl.java#L80-L84</a></p>
-<p>このため、<code>変化後の値:前</code> を <code>1:999</code> の割合で足し合わせます。ほとんど変化しないということです。</p>
-<div class="highlight"><pre><span></span><code><span class="nv">private</span> <span class="nv">static</span> <span class="nv">long</span> <span class="nv">smooth</span><span class="ss">(</span><span class="nv">long</span> <span class="nv">smoothedValue</span>, <span class="nv">long</span> <span class="nv">newValue</span>, <span class="nv">float</span> <span class="nv">smoothingFactor</span><span class="ss">)</span> {
-    <span class="k">return</span> <span class="ss">(</span><span class="nv">long</span><span class="ss">)</span> <span class="ss">(</span><span class="nv">smoothingFactor</span> <span class="o">*</span> <span class="nv">smoothedValue</span> <span class="o">+</span> <span class="ss">(</span><span class="mi">1</span><span class="nv">f</span> <span class="o">-</span> <span class="nv">smoothingFactor</span><span class="ss">)</span> <span class="o">*</span> <span class="nv">newValue</span><span class="ss">)</span><span class="c1">;</span>
-  }
-</code></pre></div>
-
-<p><a href="https://github.com/google/ExoPlayer/blob/r2.17.1/library/core/src/main/java/com/google/android/exoplayer2/DefaultLivePlaybackSpeedControl.java#L447-L449">DefaultLivePlaybackSpeedControl.java#L447-L449</a></p>
-<h3>smoothedMinPossibleLiveOffsetUs （以前の値を考慮した最も攻めたLiveOffset） の更新</h3>
-<p>前提：<code>smoothedMinPossibleLiveOffsetUs</code>の初期値は <code>C.TIME_UNSET</code> です。</p>
-<ol>
-<li>
-<p>バッファを使い切る最も攻めた <code>minPossibleLiveOffsetUs</code> を計算します。</p>
-<p><code>long minPossibleLiveOffsetUs = liveOffsetUs - bufferedDurationUs;</code></p>
-</li>
-<li>
-<p>1回目の計算であれば <code>minPossibleLiveOffsetUs</code> を採用してアーリーリターンします。</p>
-<p>この時、<code>smoothedMinPossibleLiveOffsetDeviationUs</code> は 0に設定します。</p>
-<p><code>if (smoothedMinPossibleLiveOffsetUs == C.TIME_UNSET) {
-  smoothedMinPossibleLiveOffsetUs = minPossibleLiveOffsetUs;
-  smoothedMinPossibleLiveOffsetDeviationUs = 0;
-} else {</code></p>
-</li>
-<li>
-<p>N回目（N&gt;=2）以降の計算の場合、N-1回目に計算した <code>smoothedMinPossibleLiveOffsetUs</code> と <code>minPossibleLiveOffsetUs</code> を用いて平滑化を行います。その値と <code>minPossibleLiveOffsetUs</code> のうち安全のためにより長いLiveOffsetを <code>smoothedMinPossibleLiveOffsetUs</code> とします。</p>
-<p>この時、<code>smoothedMinPossibleLiveOffsetUs</code>は1秒以上前の計算結果である一方で、<code>minPossibleLiveOffsetUs</code> はバッファを考慮した今回の値であることに注意してください。</p>
-<p><code>// Use the maximum here to ensure we keep track of the upper bound of what is safely possible,
-  // not the average.
-  smoothedMinPossibleLiveOffsetUs =
-      max(
-          minPossibleLiveOffsetUs,
-          smooth(
-              smoothedMinPossibleLiveOffsetUs,
-              minPossibleLiveOffsetUs,
-              minPossibleLiveOffsetSmoothingFactor));</code></p>
-</li>
-<li>
-<p><code>smoothedMinPossibleLiveOffsetDeviationUs</code> を計算します。</p>
-<p><code>long minPossibleLiveOffsetDeviationUs =
-      abs(minPossibleLiveOffsetUs - smoothedMinPossibleLiveOffsetUs);
-  smoothedMinPossibleLiveOffsetDeviationUs =
-      smooth(
-          smoothedMinPossibleLiveOffsetDeviationUs,
-          minPossibleLiveOffsetDeviationUs,
-          minPossibleLiveOffsetSmoothingFactor);</code></p>
-</li>
-</ol>
-<p><a href="https://github.com/google/ExoPlayer/blob/r2.17.1/library/core/src/main/java/com/google/android/exoplayer2/DefaultLivePlaybackSpeedControl.java#L392-L415">DefaultLivePlaybackSpeedControl.java#L392-L415</a></p>
-<h3>targetLiveOffsetの調整</h3>
-<ol>
-<li>
-<p>安全そうなsafeOffsetを計算します。</p>
-<p>推測：前回とのliveOffsetの変化差分が3倍以上になるケースはほとんどないということを意味しているのだと思います。このケースに対応できないのは、3GネットワークからWi-fiに接続先が切り替わり、ネットワークの速度が劇的に改善する場合などです。</p>
-<p><code>// Stay in a safe distance (3 standard deviations = &gt;99%) to the minimum possible live offset.
-long safeOffsetUs =
-    smoothedMinPossibleLiveOffsetUs + 3 * smoothedMinPossibleLiveOffsetDeviationUs;</code></p>
-</li>
-<li>
-<p>currentTargetOffsetがsafeOffsetより長いかを判断して処理を分岐させます。</p>
-<p><code>if (currentTargetLiveOffsetUs &gt; safeOffsetUs) {</code></p>
-</li>
-<li>
-<p>（safeOffsetよりcurrentTargetLiveOffsetが大きい場合）度を超えて安全なのでcurrentTargetLifeOffsetを縮小します。</p>
-<p>maxDecrementUsの計算方法については、すみませんいまいちよくわかりません。</p>
-<p>おそらく、 <code>minUpdateIntervalUs</code> を掛けているのは、値が大きくなると更新頻度が落ちるので、それを考慮して一回あたりの影響を上げるためだと思います。</p>
-<p><code>// There is room for decreasing the target offset towards the ideal or safe offset (whichever
-  // is larger). We want to limit the decrease so that the playback speed delta we achieve is
-  // the same as the maximum delta when slowing down towards the target.
-  long minUpdateIntervalUs = Util.msToUs(minUpdateIntervalMs);
-  long decrementToOffsetCurrentSpeedUs =
-      (long) ((adjustedPlaybackSpeed - 1f) * minUpdateIntervalUs);
-  long decrementToIncreaseSpeedUs = (long) ((maxPlaybackSpeed - 1f) * minUpdateIntervalUs);
-  long maxDecrementUs = decrementToOffsetCurrentSpeedUs + decrementToIncreaseSpeedUs;
-  currentTargetLiveOffsetUs =
-      max(safeOffsetUs, idealTargetLiveOffsetUs, currentTargetLiveOffsetUs - maxDecrementUs);</code></p>
-</li>
-<li>
-<p>（safeOffsetよりcurrentTargetLiveOffsetが小さい場合）速度を落とした時に目指すべきtargetOffsetを計算します。</p>
-<p>考察：調整済み速度が1倍を下回る場合、目指すべきオフセットは <code>liveOffset</code> （本メソッドの引数に渡されているOffset）です。 <code>proportionalControlFactor</code> で割る理由は、速度変化が <code>proportionalControlFactor</code> に影響を受けて現在の状況が減らされて反映されるため、それを元に戻すためだと推察されます。</p>
-<p><code>// We'd like to reach a stable condition where the current live offset stays just below the
-  // safe offset. But don't increase the target offset to more than what would allow us to slow
-  // down gradually from the current offset.
-  long offsetWhenSlowingDownNowUs =
-      liveOffsetUs - (long) (max(0f, adjustedPlaybackSpeed - 1f) / proportionalControlFactor);</code></p>
-</li>
-<li>
-<p><code>currentTargetLiveOffset</code> と <code>safeOffset</code> の間に先ほど計算した <code>offsetWhenSlowingDownNowUs</code> があるならばそれを採用します。</p>
-<p><code>currentTargetLiveOffsetUs =
-      Util.constrainValue(offsetWhenSlowingDownNowUs, currentTargetLiveOffsetUs, safeOffsetUs);</code></p>
-</li>
-</ol>
-<p><a href="https://github.com/google/ExoPlayer/blob/r2.17.1/library/core/src/main/java/com/google/android/exoplayer2/DefaultLivePlaybackSpeedControl.java#L417-L445">DefaultLivePlaybackSpeedControl.java#L417-L445</a></p>
-<h3>速度調整</h3>
-<p>liveOffsetとバッファの長さを渡す必要があります。</p>
-<ol>
-<li>
-<p><code>MediaItem.LiveConfiguration</code>に値が指定されていなければアーリーリターンします。</p>
-<p><code>if (mediaConfigurationTargetLiveOffsetUs == C.TIME_UNSET) {
-  return 1f;
-}</code></p>
-</li>
-<li>
-<p>最も攻めた平滑済みLiveOffsetを更新します。</p>
-<p><code>updateSmoothedMinPossibleLiveOffsetUs(liveOffsetUs, bufferedDurationUs);</code></p>
-</li>
-<li>
-<p>2回目の呼び出しで前回の更新から <code>minUpdateIntervalMs</code> 以下の秒数しか経過していなければアーリーリターンします。</p>
-<p><code>if (lastPlaybackSpeedUpdateMs != C.TIME_UNSET
-    &amp;&amp; SystemClock.elapsedRealtime() - lastPlaybackSpeedUpdateMs &lt; minUpdateIntervalMs) {
-  return adjustedPlaybackSpeed;
-}</code></p>
-</li>
-<li>
-<p>targetLiveOffsetを更新します。</p>
-<p>```
-lastPlaybackSpeedUpdateMs = SystemClock.elapsedRealtime();</p>
-<p>adjustTargetLiveOffsetUs(liveOffsetUs);
-```</p>
-</li>
-<li>
-<p>オフセット誤差を取り、誤差に比例定数を掛けた値を1に足して、調整後の値とします。</p>
-<p><code>long liveOffsetErrorUs = liveOffsetUs - currentTargetLiveOffsetUs;
-if (Math.abs(liveOffsetErrorUs) &lt; maxLiveOffsetErrorUsForUnitSpeed) {
-  adjustedPlaybackSpeed = 1f;
-} else {
-  float calculatedSpeed = 1f + proportionalControlFactor * liveOffsetErrorUs;
-  adjustedPlaybackSpeed =
-      Util.constrainValue(calculatedSpeed, minPlaybackSpeed, maxPlaybackSpeed);
-}
-return adjustedPlaybackSpeed;</code></p>
-</li>
-</ol>
-<p><a href="https://github.com/google/ExoPlayer/blob/r2.17.1/library/core/src/main/java/com/google/android/exoplayer2/DefaultLivePlaybackSpeedControl.java#L338-L361">DefaultLivePlaybackSpeedControl.java#L338-L361</a></p>
-<h3>notifyRebufferのコール時（ある条件のリバッファリングが起きた時）</h3>
-<p>currentTargetLiveOffsetが500ms増え、<code>lastPlaybackSpeedUpdateMs</code> がアンセットされます。</p>
-<div class="highlight"><pre><span></span><code><span class="w">  </span><span class="nv">@Override</span><span class="w"></span>
-<span class="w">  </span><span class="k">public</span><span class="w"> </span><span class="n">void</span><span class="w"> </span><span class="n">notifyRebuffer</span><span class="p">()</span><span class="w"> </span><span class="err">{</span><span class="w"></span>
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">currentTargetLiveOffsetUs</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">C</span><span class="p">.</span><span class="n">TIME_UNSET</span><span class="p">)</span><span class="w"> </span><span class="err">{</span><span class="w"></span>
-<span class="w">      </span><span class="k">return</span><span class="p">;</span><span class="w"></span>
-<span class="w">    </span><span class="err">}</span><span class="w"></span>
-<span class="w">    </span><span class="n">currentTargetLiveOffsetUs</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">targetLiveOffsetRebufferDeltaUs</span><span class="p">;</span><span class="w"></span>
-<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">maxTargetLiveOffsetUs</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">C</span><span class="p">.</span><span class="n">TIME_UNSET</span><span class="w"></span>
-<span class="w">        </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">currentTargetLiveOffsetUs</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">maxTargetLiveOffsetUs</span><span class="p">)</span><span class="w"> </span><span class="err">{</span><span class="w"></span>
-<span class="w">      </span><span class="n">currentTargetLiveOffsetUs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">maxTargetLiveOffsetUs</span><span class="p">;</span><span class="w"></span>
-<span class="w">    </span><span class="err">}</span><span class="w"></span>
-<span class="w">    </span><span class="n">lastPlaybackSpeedUpdateMs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">C</span><span class="p">.</span><span class="n">TIME_UNSET</span><span class="p">;</span><span class="w"></span>
-<span class="w">  </span><span class="err">}</span><span class="w"></span>
-</code></pre></div>
-
-<p><a href="https://github.com/google/ExoPlayer/blob/r2.17.1/library/core/src/main/java/com/google/android/exoplayer2/DefaultLivePlaybackSpeedControl.java#L324-L335">DefaultLivePlaybackSpeedControl.java#L324-L335</a></p>                </article>
+<li><code>void onLoadCompleted(T loadable, long elapsedRealtimeMs, long loadDurationMs)</code></li>
+<li><code>void onLoadCancled(T loadable, long elapsedRealtimeMs, long loadDurationMs, boolean released)</code></li>
+<li><code>LoadErrorAction onLoadError(T loadable, long elapsedRealtimeMs, long loadDurationMs, IOException error, int errorCount)</code></li>
+</ul>                </article>
             </aside><!-- /#featured -->
                 <section id="content" class="body">
                     <h1>Other articles</h1>
@@ -308,14 +60,14 @@ return adjustedPlaybackSpeed;</code></p>
 
             <li><article class="hentry">
                 <header>
-                    <h1><a href="/exoplayerniokeruliveoffset.html" rel="bookmark"
-                           title="Permalink to ExoPlayerにおけるLiveOffset">ExoPlayerにおけるLiveOffset</a></h1>
+                    <h1><a href="/exoplayernobufferkurasu.html" rel="bookmark"
+                           title="Permalink to ExoPlayerのBufferクラス">ExoPlayerのBufferクラス</a></h1>
                 </header>
 
                 <div class="entry-content">
 <footer class="post-info">
-        <abbr class="published" title="2022-02-25T00:00:00+09:00">
-                Published: 金 25 2月 2022
+        <abbr class="published" title="2023-03-09T00:00:00+09:00">
+                Published: 木 09 3月 2023
         </abbr>
 
         <address class="vcard author">
@@ -324,14 +76,235 @@ return adjustedPlaybackSpeed;</code></p>
 <p>In <a href="/category/exoplayer.html">ExoPlayer</a>.</p>
 
 </footer><!-- /.post-info -->                <h1>Overview</h1>
-<p>ライブ再生に存在する概念であるライブオフセットについて扱います。  </p>
+<p>SampleStreamに渡されるDecoderInputBufferを掘っていく途中で基底となるBuffer抽象クラスを見ます。</p>
+<h1>責務</h1>
+<p>バッファとフラグの基底クラス。</p>
+<h2>フラ …</h2>
+                <a class="readmore" href="/exoplayernobufferkurasu.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/exoplayernodecoderinputbufferkurasu.html" rel="bookmark"
+                           title="Permalink to ExoPlayerのDecoderInputBufferクラス">ExoPlayerのDecoderInputBufferクラス</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2023-03-09T00:00:00+09:00">
+                Published: 木 09 3月 2023
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/dev-platong.html">dev-platong</a>
+        </address>
+<p>In <a href="/category/exoplayer.html">ExoPlayer</a>.</p>
+
+</footer><!-- /.post-info -->                <h1>Overview</h1>
+<p>SampleStreamで <code>readData()</code> 時に渡される <code>DecoderInputBuffer</code> クラスについて調べる。</p>
+<h2>責務</h2>
+<p>デコーダへの入力を保持します。  </p>
+<h2>基底</h2>
+<p><a href="./exoplayer_buffer.md">Buffer抽象クラス</a></p>
+<h2>@BufferReplacementMode</h2>
+<p>既存のバ …</p>
+                <a class="readmore" href="/exoplayernodecoderinputbufferkurasu.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/exoplayernoformatkurasu.html" rel="bookmark"
+                           title="Permalink to ExoPlayerのFormatクラス">ExoPlayerのFormatクラス</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2023-03-09T00:00:00+09:00">
+                Published: 木 09 3月 2023
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/dev-platong.html">dev-platong</a>
+        </address>
+<p>In <a href="/category/exoplayer.html">ExoPlayer</a>.</p>
+
+</footer><!-- /.post-info -->                <h1>概要</h1>
+<p>SampleStreamがreadData()する際に渡される FormatHolder から掘り下げます。</p>
+<h2>責務</h2>
+<p>メディアフォーマットを表現します。finalクラスです。</p>
+<h3>全てのフ …</h3>
+                <a class="readmore" href="/exoplayernoformatkurasu.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/exoplayernohlssamplestreamhuainarukurasu.html" rel="bookmark"
+                           title="Permalink to ExoPlayerのHlsSampleStreamファイナルクラス">ExoPlayerのHlsSampleStreamファイナルクラス</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2023-03-07T00:00:00+09:00">
+                Published: 火 07 3月 2023
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/dev-platong.html">dev-platong</a>
+        </address>
+<p>In <a href="/category/exoplayer.html">ExoPlayer</a>.</p>
+
+</footer><!-- /.post-info -->                <h1>Overview</h1>
+<p>SampleStreamを読んだので、その実装クラスを見ていきます。</p>
+<h1>責務</h1>
+<p>HLSの中の特定のサンプルキューを表現します。</p>
+<h1>HlsSampleStreamWrapperファイナル …</h1>
+                <a class="readmore" href="/exoplayernohlssamplestreamhuainarukurasu.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/exoplayernosamplestreamintahuesu.html" rel="bookmark"
+                           title="Permalink to ExoPlayerのSampleStreamインターフェース">ExoPlayerのSampleStreamインターフェース</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2023-03-07T00:00:00+09:00">
+                Published: 火 07 3月 2023
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/dev-platong.html">dev-platong</a>
+        </address>
+<p>In <a href="/category/exoplayer.html">ExoPlayer</a>.</p>
+
+</footer><!-- /.post-info -->                <h1>概要</h1>
+<p>Rendererインターフェースによる動画データの描画の挙動を追っていく過程です。<br>
+Rendererがデータを読み込んでいるSampleStreamに …</p>
+                <a class="readmore" href="/exoplayernosamplestreamintahuesu.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/exoplayernosequenceableloaderintahuesu.html" rel="bookmark"
+                           title="Permalink to ExoPlayerのSequenceableLoaderインターフェース">ExoPlayerのSequenceableLoaderインターフェース</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2023-03-07T00:00:00+09:00">
+                Published: 火 07 3月 2023
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/dev-platong.html">dev-platong</a>
+        </address>
+<p>In <a href="/category/exoplayer.html">ExoPlayer</a>.</p>
+
+</footer><!-- /.post-info -->                <h1>Overview</h1>
+<p>HlsSampleWrapperがimplementsしているので。</p>
+<h2>責務</h2>
+<p>他のローダーと同期的に進行可能なローダー。</p>
+<h2>基底</h2>
+<p>なし</p>
+<h2>空間</h2>
+<p><code>source</code></p>
+<h1>インターフェース</h1>
+<h2>Callback<T extends SequencableLoader></h2>
+<p><code>void onContinueLoadingRequested …</code></p>
+                <a class="readmore" href="/exoplayernosequenceableloaderintahuesu.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/exoplayernosetmediaitemwodu-ndashi.html" rel="bookmark"
+                           title="Permalink to ExoPlayerのsetMediaItemを読んだ時">ExoPlayerのsetMediaItemを読んだ時</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2023-02-28T00:00:00+09:00">
+                Published: 火 28 2月 2023
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/dev-platong.html">dev-platong</a>
+        </address>
+<p>In <a href="/category/exoplayer.html">ExoPlayer</a>.</p>
+
+</footer><!-- /.post-info -->                <h2>ExoPlayer.setMediaItemを呼びます。</h2>
+<p><code>ExoPlayerImpl.setMediaSourcesInternal()</code> が呼ばれます。</p>
+<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImpl.java#L1529">exoplayer2/ExoPlayerImpl.java#L1529</a></p>
+<p>仰々しいですが、やっていることは <code>internalPlayer.setMediaSources()</code> を呼び、 <code>updatePlaybackInfo()</code> を呼びます。</p>
+<h2>ExoPlayerImplInternal.setMediaSources()</h2>
+<p><code>MSG_SET_MEDIA_SOURCES …</code></p>
+                <a class="readmore" href="/exoplayernosetmediaitemwodu-ndashi.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/simpleexoplayernosheng-cheng-shi.html" rel="bookmark"
+                           title="Permalink to SimpleExoPlayerの生成時">SimpleExoPlayerの生成時</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2023-02-27T00:00:00+09:00">
+                Published: 月 27 2月 2023
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/dev-platong.html">dev-platong</a>
+        </address>
+<p>In <a href="/category/exoplayer.html">ExoPlayer</a>.</p>
+
+</footer><!-- /.post-info -->                <h2>Constructing時に関連するクラス・プロパティ</h2>
 <ul>
-<li>ライブオフセットとは何か</li>
-<li>ライブオフセ …</li></ul>
-                <a class="readmore" href="/exoplayerniokeruliveoffset.html">read more</a>
+<li>PriorityTaskManager： その名の通り優先的にタスクを実行するクラス</li>
+<li>AudioAttributes： 全てのAPIでサポートでき …</li></ul>
+                <a class="readmore" href="/simpleexoplayernosheng-cheng-shi.html">read more</a>
+                </div><!-- /.entry-content -->
+            </article></li>
+
+            <li><article class="hentry">
+                <header>
+                    <h1><a href="/exoplayerimplinternalnoju-dong-wozhui-usheng-cheng-mawari.html" rel="bookmark"
+                           title="Permalink to ExoPlayerImplInternalの挙動を追う（生成まわり）">ExoPlayerImplInternalの挙動を追う（生成まわり）</a></h1>
+                </header>
+
+                <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2023-02-24T00:00:00+09:00">
+                Published: 金 24 2月 2023
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/dev-platong.html">dev-platong</a>
+        </address>
+<p>In <a href="/category/exoplayer.html">ExoPlayer</a>.</p>
+
+</footer><!-- /.post-info -->                <h2>ExoPlayerImplInternalの生成時</h2>
+<h3>LoadControl関連</h3>
+<p>LoadControl から 巻き戻し関連の値を取得する。</p>
+<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L248-L249">ExoPlayerImplInternal.java#L248-L249</a></p>
+<h3>PlaybackInfo関連</h3>
+<p>ダミーのPlaybackInfoインスタンスと、それに基づく PlaybackInfoUpdateク …</p>
+                <a class="readmore" href="/exoplayerimplinternalnoju-dong-wozhui-usheng-cheng-mawari.html">read more</a>
                 </div><!-- /.entry-content -->
             </article></li>
                 </ol><!-- /#posts-list -->
+<p class="paginator">
+    Page 1 / 2
+        <a href="/category/exoplayer2.html">&raquo;</a>
+        <a href="/category/exoplayer2.html">&#8649;</a>
+</p>
                 </section><!-- /#content -->
         <section id="extras" class="body">
                 <div class="blogroll">
