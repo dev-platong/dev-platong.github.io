@@ -27,37 +27,36 @@ LiveOffsetは、現在の時刻から再生位置が何秒遅れているかを�
 
 採択されるアルゴリズムにも優先順位がある。
 
-1. #EXT-X-START がある場合
+1. `#EXT-X-START` がある場合
 
-マスタープレイリストまたはメディアプレイリストに記載される可能性があるタグです。  
-記載されたプレイリストからの相対位置または、絶対位置で定義できます（絶対位置はおそらくMasterPlaylistに記載する想定だと思われます）。  
-#EXT-X-ENDLISTタグがプレイリストに含まれていない場合（ライブ再生）ではTARGET DURATIONの3倍以下の値を設定すべきではないことが示されています。  
+    マスタープレイリストまたはメディアプレイリストに記載される可能性があるタグです。  
+    記載されたプレイリストからの相対位置または、絶対位置で定義できます（絶対位置はおそらくMasterPlaylistに記載する想定だと思われます）。  
+    `#EXT-X-ENDLIST` タグがプレイリストに含まれていない場合（ライブ再生）ではTARGET DURATIONの3倍以下の値を設定すべきではないことが示されています。  
+    
+    [rfc8216#section-4.3.5.2](https://datatracker.ietf.org/doc/html/rfc8216#section-4.3.5.2)で規定されています。
 
-[rfc8216#section-4.3.5.2](https://datatracker.ietf.org/doc/html/rfc8216#section-4.3.5.2)で規定されています。
+2. `#EXT-X-SERVER-CONTROL` に `PART-HOLD-BACK` が設定されていて、part target durationがある場合
 
-2. #EXT-X-SERVER-CONTROLにPART-HOLD-BACKが設定されていて、part target durationがある場合
+    Media Playlist限定のタグです。低遅延モードの時のプレイリストの終わりからの最小再生位置を示します。この値は最低でもPART TARGET DURATIONの2倍でなければいけません。また、PART TARGET DURATIONの3倍以上であるべきです。　　
+    もし異なるレンディションが異なるPART TARGET DURATIONsを持っているならば、PART-HOLD-BACKは最低でもPART TARGET DURATIONの3倍であるべきです。
 
-Media Playlist限定のタグです。低遅延モードの時のプレイリストの終わりからの最小再生位置を示します。この値は最低でもPART TARGET DURATIONの2倍でなければいけません。また、PART TARGET DURATIONの3倍以上であるべきです。　　
-もし異なるレンディションが異なるPART TARGET DURATIONsを持っているならば、PART-HOLD-BACKは最低でもPART TARGET DURATIONの3倍であるべきです。
+    [draft-pantos-hls-rfc8216bis#section-4.4.3.8](https://datatracker.ietf.org/doc/html/draft-pantos-hls-rfc8216bis#section-4.4.3.8)
 
+    PART TARGET DURATIONについて
 
-[draft-pantos-hls-rfc8216bis#section-4.4.3.8](https://datatracker.ietf.org/doc/html/draft-pantos-hls-rfc8216bis#section-4.4.3.8)
+    [draft-pantos-hls-rfc8216bis#section-4.4.3.7](https://datatracker.ietf.org/doc/html/draft-pantos-hls-rfc8216bis#section-4.4.3.7)
 
-PART TARGET DURATION
+3.  `#EXT-X-SERVER-CONTROL` に `HOLD-BACK` が設定されている場合
 
-[draft-pantos-hls-rfc8216bis#section-4.4.3.7](https://datatracker.ietf.org/doc/html/draft-pantos-hls-rfc8216bis#section-4.4.3.7)
+    Media Playlist限定のタグです。プレイリストの終わりからの最小再生位置を示します。
 
-3.  #EXT-X-SERVER-CONTROLにHOLD-BACKが設定されている場合
-
-Media Playlist限定のタグです。プレイリストの終わりからの最小再生位置を示します。
-
-[draft-pantos-hls-rfc8216bis#section-4.4.3.8](https://datatracker.ietf.org/doc/html/draft-pantos-hls-rfc8216bis#section-4.4.3.8)
+    [draft-pantos-hls-rfc8216bis#section-4.4.3.8](https://datatracker.ietf.org/doc/html/draft-pantos-hls-rfc8216bis#section-4.4.3.8)
 
 4. 上記の項目が該当しない時
 
-TARGET DURATIONの3倍になります。
+    TARGET DURATIONの3倍になります。
 
-[HLS spec 4.4.3.8](https://datatracker.ietf.org/doc/html/draft-pantos-hls-rfc8216bis-09#:~:text=Its%20absence%20implies%20a%20value%20of%20three%0A%20%20%20%20%20%20times%20the%20Target%20Duration.)
+    [HLS spec 4.4.3.8](https://datatracker.ietf.org/doc/html/draft-pantos-hls-rfc8216bis-09#:~:text=Its%20absence%20implies%20a%20value%20of%20three%0A%20%20%20%20%20%20times%20the%20Target%20Duration.)
 
 
 ```java
