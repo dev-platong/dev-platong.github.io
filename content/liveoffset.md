@@ -13,7 +13,7 @@ Authors: dev-platong
 
 # LiveOffsetとは
 
-LiveOffsetは、現在の時刻から再生位置が何秒遅れているかを示します。
+LiveOffsetは、現在の時刻から再生位置が何秒遅れているかを示します。 FROM: [live-streaming.md#L11-L12](https://github.com/google/ExoPlayer/blame/r2.17.1/docs/live-streaming.md#L11-L12)
 
 <img src="../images/getLiveOffsetUs.jpg" alt="ExoPlayerImplInternal Line 1108 getLiveOffsetUs function"/>
 
