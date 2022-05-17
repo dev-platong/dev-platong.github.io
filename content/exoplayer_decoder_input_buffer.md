@@ -14,7 +14,7 @@ SampleStreamで `readData()` 時に渡される `DecoderInputBuffer` クラス�
 
 ## 基底
 
-[Buffer抽象クラス]{filename}./exoplayer_buffer.md)
+[Buffer抽象クラス]({filename}./exoplayer_buffer.md)
 
 ## @BufferReplacementMode
 
