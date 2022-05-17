@@ -583,43 +583,47 @@ boolean setTargetLiveOffset = false;
 &lt;p&gt;前提：&lt;code&gt;smoothedMinPossibleLiveOffsetUs&lt;/code&gt;の初期値は &lt;code&gt;C.TIME_UNSET&lt;/code&gt; です。&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;
-&lt;p&gt;バッファを使い切る最も攻めた &lt;code&gt;minPossibleLiveOffsetUs&lt;/code&gt; を計算します。&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;java
-long minPossibleLiveOffsetUs = liveOffsetUs - bufferedDurationUs;&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;バッファを使い切る最も攻めた &lt;code&gt;minPossibleLiveOffsetUs&lt;/code&gt; を計算します。  &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;long minPossibleLiveOffsetUs = liveOffsetUs - bufferedDurationUs;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;1回目の計算であれば &lt;code&gt;minPossibleLiveOffsetUs&lt;/code&gt; を採用してアーリーリターンします。&lt;/p&gt;
 &lt;p&gt;この時、&lt;code&gt;smoothedMinPossibleLiveOffsetDeviationUs&lt;/code&gt; は 0に設定します。&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;java
-if (smoothedMinPossibleLiveOffsetUs == C.TIME_UNSET) {
-  smoothedMinPossibleLiveOffsetUs = minPossibleLiveOffsetUs;
-  smoothedMinPossibleLiveOffsetDeviationUs = 0;
-} else {&lt;/code&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;smoothedMinPossibleLiveOffsetUs&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="nv"&gt;C&lt;/span&gt;.&lt;span class="nv"&gt;TIME_UNSET&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt; {
+  &lt;span class="nv"&gt;smoothedMinPossibleLiveOffsetUs&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nv"&gt;minPossibleLiveOffsetUs&lt;/span&gt;&lt;span class="c1"&gt;;&lt;/span&gt;
+  &lt;span class="nv"&gt;smoothedMinPossibleLiveOffsetDeviationUs&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="c1"&gt;;&lt;/span&gt;
+} &lt;span class="k"&gt;else&lt;/span&gt; {
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;N回目（N&amp;gt;=2）以降の計算の場合、N-1回目に計算した &lt;code&gt;smoothedMinPossibleLiveOffsetUs&lt;/code&gt; と &lt;code&gt;minPossibleLiveOffsetUs&lt;/code&gt; を用いて平滑化を行います。その値と &lt;code&gt;minPossibleLiveOffsetUs&lt;/code&gt; のうち安全のためにより長いLiveOffsetを &lt;code&gt;smoothedMinPossibleLiveOffsetUs&lt;/code&gt; とします。&lt;/p&gt;
 &lt;p&gt;この時、&lt;code&gt;smoothedMinPossibleLiveOffsetUs&lt;/code&gt;は1秒以上前の計算結果である一方で、&lt;code&gt;minPossibleLiveOffsetUs&lt;/code&gt; はバッファを考慮した今回の値であることに注意してください。&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;java
-// Use the maximum here to ensure we keep track of the upper bound of what is safely possible,
-  // not the average.
-  smoothedMinPossibleLiveOffsetUs =
-      max(
-          minPossibleLiveOffsetUs,
-          smooth(
-              smoothedMinPossibleLiveOffsetUs,
-              minPossibleLiveOffsetUs,
-              minPossibleLiveOffsetSmoothingFactor));&lt;/code&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;// Use the maximum here to ensure we keep track of the upper bound of what is safely possible,
+// not the average.
+smoothedMinPossibleLiveOffsetUs =
+  max(
+    minPossibleLiveOffsetUs,
+    smooth(
+      smoothedMinPossibleLiveOffsetUs,
+      minPossibleLiveOffsetUs,
+      minPossibleLiveOffsetSmoothingFactor));
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;&lt;code&gt;smoothedMinPossibleLiveOffsetDeviationUs&lt;/code&gt; を計算します。&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;java
-long minPossibleLiveOffsetDeviationUs =
-      abs(minPossibleLiveOffsetUs - smoothedMinPossibleLiveOffsetUs);
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;long minPossibleLiveOffsetDeviationUs =
+  abs(minPossibleLiveOffsetUs - smoothedMinPossibleLiveOffsetUs);
   smoothedMinPossibleLiveOffsetDeviationUs =
-      smooth(
-          smoothedMinPossibleLiveOffsetDeviationUs,
-          minPossibleLiveOffsetDeviationUs,
-          minPossibleLiveOffsetSmoothingFactor);&lt;/code&gt;&lt;/p&gt;
+    smooth(
+      smoothedMinPossibleLiveOffsetDeviationUs,
+      minPossibleLiveOffsetDeviationUs,
+      minPossibleLiveOffsetSmoothingFactor);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
 &lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;&lt;a href="https://github.com/google/ExoPlayer/blob/r2.17.1/library/core/src/main/java/com/google/android/exoplayer2/DefaultLivePlaybackSpeedControl.java#L392-L415"&gt;DefaultLivePlaybackSpeedControl.java#L392-L415&lt;/a&gt;&lt;/p&gt;
@@ -628,47 +632,50 @@ long minPossibleLiveOffsetDeviationUs =
 &lt;li&gt;
 &lt;p&gt;安全そうなsafeOffsetを計算します。&lt;/p&gt;
 &lt;p&gt;推測：前回とのliveOffsetの変化差分が3倍以上になるケースはほとんどないということを意味しているのだと思います。このケースに対応できないのは、3GネットワークからWi-fiに接続先が切り替わり、ネットワークの速度が劇的に改善する場合などです。&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;java
-// Stay in a safe distance (3 standard deviations = &amp;gt;99%) to the minimum possible live offset.
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;// Stay in a safe distance (3 standard deviations = &amp;gt;99%) to the minimum possible live offset.
 long safeOffsetUs =
-    smoothedMinPossibleLiveOffsetUs + 3 * smoothedMinPossibleLiveOffsetDeviationUs;&lt;/code&gt;&lt;/p&gt;
+  smoothedMinPossibleLiveOffsetUs + 3 * smoothedMinPossibleLiveOffsetDeviationUs;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;currentTargetOffsetがsafeOffsetより長いかを判断して処理を分岐させます。&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;java
-if (currentTargetLiveOffsetUs &amp;gt; safeOffsetUs) {&lt;/code&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;currentTargetLiveOffsetUs&lt;/span&gt; &lt;span class="o"&gt;&amp;gt;&lt;/span&gt; &lt;span class="nv"&gt;safeOffsetUs&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt; {
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;（safeOffsetよりcurrentTargetLiveOffsetが大きい場合）度を超えて安全なのでcurrentTargetLifeOffsetを縮小します。&lt;/p&gt;
 &lt;p&gt;maxDecrementUsの計算方法については、すみませんいまいちよくわかりません。&lt;/p&gt;
 &lt;p&gt;おそらく、 &lt;code&gt;minUpdateIntervalUs&lt;/code&gt; を掛けているのは、値が大きくなると更新頻度が落ちるので、それを考慮して一回あたりの影響を上げるためだと思います。&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;java
-  // There is room for decreasing the target offset towards the ideal or safe offset (whichever
-  // is larger). We want to limit the decrease so that the playback speed delta we achieve is
-  // the same as the maximum delta when slowing down towards the target.
-  long minUpdateIntervalUs = Util.msToUs(minUpdateIntervalMs);
-  long decrementToOffsetCurrentSpeedUs =
-      (long) ((adjustedPlaybackSpeed - 1f) * minUpdateIntervalUs);
-  long decrementToIncreaseSpeedUs = (long) ((maxPlaybackSpeed - 1f) * minUpdateIntervalUs);
-  long maxDecrementUs = decrementToOffsetCurrentSpeedUs + decrementToIncreaseSpeedUs;
-  currentTargetLiveOffsetUs =
-      max(safeOffsetUs, idealTargetLiveOffsetUs, currentTargetLiveOffsetUs - maxDecrementUs);&lt;/code&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="o"&gt;//&lt;/span&gt; &lt;span class="nv"&gt;There&lt;/span&gt; &lt;span class="nv"&gt;is&lt;/span&gt; &lt;span class="nv"&gt;room&lt;/span&gt; &lt;span class="k"&gt;for&lt;/span&gt; &lt;span class="nv"&gt;decreasing&lt;/span&gt; &lt;span class="nv"&gt;the&lt;/span&gt; &lt;span class="nv"&gt;target&lt;/span&gt; &lt;span class="nv"&gt;offset&lt;/span&gt; &lt;span class="nv"&gt;towards&lt;/span&gt; &lt;span class="nv"&gt;the&lt;/span&gt; &lt;span class="nv"&gt;ideal&lt;/span&gt; &lt;span class="nv"&gt;or&lt;/span&gt; &lt;span class="nv"&gt;safe&lt;/span&gt; &lt;span class="nv"&gt;offset&lt;/span&gt; &lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;whichever&lt;/span&gt;
+&lt;span class="o"&gt;//&lt;/span&gt; &lt;span class="nv"&gt;is&lt;/span&gt; &lt;span class="nv"&gt;larger&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;. &lt;span class="nv"&gt;We&lt;/span&gt; &lt;span class="nv"&gt;want&lt;/span&gt; &lt;span class="nv"&gt;to&lt;/span&gt; &lt;span class="nv"&gt;limit&lt;/span&gt; &lt;span class="nv"&gt;the&lt;/span&gt; &lt;span class="nv"&gt;decrease&lt;/span&gt; &lt;span class="nv"&gt;so&lt;/span&gt; &lt;span class="nv"&gt;that&lt;/span&gt; &lt;span class="nv"&gt;the&lt;/span&gt; &lt;span class="nv"&gt;playback&lt;/span&gt; &lt;span class="nv"&gt;speed&lt;/span&gt; &lt;span class="nv"&gt;delta&lt;/span&gt; &lt;span class="nv"&gt;we&lt;/span&gt; &lt;span class="nv"&gt;achieve&lt;/span&gt; &lt;span class="nv"&gt;is&lt;/span&gt;
+&lt;span class="o"&gt;//&lt;/span&gt; &lt;span class="nv"&gt;the&lt;/span&gt; &lt;span class="nv"&gt;same&lt;/span&gt; &lt;span class="nv"&gt;as&lt;/span&gt; &lt;span class="nv"&gt;the&lt;/span&gt; &lt;span class="nv"&gt;maximum&lt;/span&gt; &lt;span class="nv"&gt;delta&lt;/span&gt; &lt;span class="nv"&gt;when&lt;/span&gt; &lt;span class="nv"&gt;slowing&lt;/span&gt; &lt;span class="nv"&gt;down&lt;/span&gt; &lt;span class="nv"&gt;towards&lt;/span&gt; &lt;span class="nv"&gt;the&lt;/span&gt; &lt;span class="nv"&gt;target&lt;/span&gt;.
+&lt;span class="nv"&gt;long&lt;/span&gt; &lt;span class="nv"&gt;minUpdateIntervalUs&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nv"&gt;Util&lt;/span&gt;.&lt;span class="nv"&gt;msToUs&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;minUpdateIntervalMs&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;&lt;span class="c1"&gt;;&lt;/span&gt;
+&lt;span class="nv"&gt;long&lt;/span&gt; &lt;span class="nv"&gt;decrementToOffsetCurrentSpeedUs&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt;
+  &lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;long&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt; &lt;span class="ss"&gt;((&lt;/span&gt;&lt;span class="nv"&gt;adjustedPlaybackSpeed&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="nv"&gt;f&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="nv"&gt;minUpdateIntervalUs&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;&lt;span class="c1"&gt;;&lt;/span&gt;
+&lt;span class="nv"&gt;long&lt;/span&gt; &lt;span class="nv"&gt;decrementToIncreaseSpeedUs&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;long&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt; &lt;span class="ss"&gt;((&lt;/span&gt;&lt;span class="nv"&gt;maxPlaybackSpeed&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="nv"&gt;f&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt; &lt;span class="o"&gt;*&lt;/span&gt; &lt;span class="nv"&gt;minUpdateIntervalUs&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;&lt;span class="c1"&gt;;&lt;/span&gt;
+&lt;span class="nv"&gt;long&lt;/span&gt; &lt;span class="nv"&gt;maxDecrementUs&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nv"&gt;decrementToOffsetCurrentSpeedUs&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="nv"&gt;decrementToIncreaseSpeedUs&lt;/span&gt;&lt;span class="c1"&gt;;&lt;/span&gt;
+&lt;span class="nv"&gt;currentTargetLiveOffsetUs&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt;
+  &lt;span class="nv"&gt;max&lt;/span&gt;&lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;safeOffsetUs&lt;/span&gt;, &lt;span class="nv"&gt;idealTargetLiveOffsetUs&lt;/span&gt;, &lt;span class="nv"&gt;currentTargetLiveOffsetUs&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="nv"&gt;maxDecrementUs&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt;&lt;span class="c1"&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;（safeOffsetよりcurrentTargetLiveOffsetが小さい場合）速度を落とした時に目指すべきtargetOffsetを計算します。&lt;/p&gt;
 &lt;p&gt;考察：調整済み速度が1倍を下回る場合、目指すべきオフセットは &lt;code&gt;liveOffset&lt;/code&gt; （本メソッドの引数に渡されているOffset）です。 &lt;code&gt;proportionalControlFactor&lt;/code&gt; で割る理由は、速度変化が &lt;code&gt;proportionalControlFactor&lt;/code&gt; に影響を受けて現在の状況が減らされて反映されるため、それを元に戻すためだと推察されます。&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;java
-// We'd like to reach a stable condition where the current live offset stays just below the
-  // safe offset. But don't increase the target offset to more than what would allow us to slow
-  // down gradually from the current offset.
-  long offsetWhenSlowingDownNowUs =
-      liveOffsetUs - (long) (max(0f, adjustedPlaybackSpeed - 1f) / proportionalControlFactor);&lt;/code&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;// We&amp;#39;d like to reach a stable condition where the current live offset stays just below the
+// safe offset. But don&amp;#39;t increase the target offset to more than what would allow us to slow
+// down gradually from the current offset.
+long offsetWhenSlowingDownNowUs = liveOffsetUs - (long) (max(0f, adjustedPlaybackSpeed - 1f) / proportionalControlFactor);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;&lt;code&gt;currentTargetLiveOffset&lt;/code&gt; と &lt;code&gt;safeOffset&lt;/code&gt; の間に先ほど計算した &lt;code&gt;offsetWhenSlowingDownNowUs&lt;/code&gt; があるならばそれを採用します。&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;java
-currentTargetLiveOffsetUs =
-      Util.constrainValue(offsetWhenSlowingDownNowUs, currentTargetLiveOffsetUs, safeOffsetUs);&lt;/code&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;currentTargetLiveOffsetUs&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;Util&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;constrainValue&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;offsetWhenSlowingDownNowUs&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;currentTargetLiveOffsetUs&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;safeOffsetUs&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
 &lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;&lt;a href="https://github.com/google/ExoPlayer/blob/r2.17.1/library/core/src/main/java/com/google/android/exoplayer2/DefaultLivePlaybackSpeedControl.java#L417-L445"&gt;DefaultLivePlaybackSpeedControl.java#L417-L445&lt;/a&gt;&lt;/p&gt;
@@ -677,43 +684,48 @@ currentTargetLiveOffsetUs =
 &lt;ol&gt;
 &lt;li&gt;
 &lt;p&gt;&lt;code&gt;MediaItem.LiveConfiguration&lt;/code&gt;に値が指定されていなければアーリーリターンします。&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;java
-if (mediaConfigurationTargetLiveOffsetUs == C.TIME_UNSET) {
-  return 1f;
-}&lt;/code&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;mediaConfigurationTargetLiveOffsetUs&lt;/span&gt; &lt;span class="o"&gt;==&lt;/span&gt; &lt;span class="nv"&gt;C&lt;/span&gt;.&lt;span class="nv"&gt;TIME_UNSET&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt; {
+  &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="nv"&gt;f&lt;/span&gt;&lt;span class="c1"&gt;;&lt;/span&gt;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;最も攻めた平滑済みLiveOffsetを更新します。&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;java
-updateSmoothedMinPossibleLiveOffsetUs(liveOffsetUs, bufferedDurationUs);&lt;/code&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;updateSmoothedMinPossibleLiveOffsetUs(liveOffsetUs, bufferedDurationUs);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;2回目の呼び出しで前回の更新から &lt;code&gt;minUpdateIntervalMs&lt;/code&gt; 以下の秒数しか経過していなければアーリーリターンします。&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;java
-if (lastPlaybackSpeedUpdateMs != C.TIME_UNSET
-    &amp;amp;&amp;amp; SystemClock.elapsedRealtime() - lastPlaybackSpeedUpdateMs &amp;lt; minUpdateIntervalMs) {
-  return adjustedPlaybackSpeed;
-}&lt;/code&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="ss"&gt;(&lt;/span&gt;&lt;span class="nv"&gt;lastPlaybackSpeedUpdateMs&lt;/span&gt; &lt;span class="o"&gt;!=&lt;/span&gt; &lt;span class="nv"&gt;C&lt;/span&gt;.&lt;span class="nv"&gt;TIME_UNSET&lt;/span&gt;
+    &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class="nv"&gt;SystemClock&lt;/span&gt;.&lt;span class="nv"&gt;elapsedRealtime&lt;/span&gt;&lt;span class="ss"&gt;()&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="nv"&gt;lastPlaybackSpeedUpdateMs&lt;/span&gt; &lt;span class="o"&gt;&amp;lt;&lt;/span&gt; &lt;span class="nv"&gt;minUpdateIntervalMs&lt;/span&gt;&lt;span class="ss"&gt;)&lt;/span&gt; {
+  &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nv"&gt;adjustedPlaybackSpeed&lt;/span&gt;&lt;span class="c1"&gt;;&lt;/span&gt;
+}
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;targetLiveOffsetを更新します。&lt;/p&gt;
-&lt;p&gt;```java
-lastPlaybackSpeedUpdateMs = SystemClock.elapsedRealtime();&lt;/p&gt;
-&lt;p&gt;adjustTargetLiveOffsetUs(liveOffsetUs);
-```&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;lastPlaybackSpeedUpdateMs = SystemClock.elapsedRealtime();
+
+adjustTargetLiveOffsetUs(liveOffsetUs);
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
 &lt;/li&gt;
 &lt;li&gt;
 &lt;p&gt;オフセット誤差を取り、誤差に比例定数を掛けた値を1に足して、調整後の値とします。&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;java
-long liveOffsetErrorUs = liveOffsetUs - currentTargetLiveOffsetUs;
-if (Math.abs(liveOffsetErrorUs) &amp;lt; maxLiveOffsetErrorUsForUnitSpeed) {
-  adjustedPlaybackSpeed = 1f;
-} else {
-  float calculatedSpeed = 1f + proportionalControlFactor * liveOffsetErrorUs;
-  adjustedPlaybackSpeed =
-      Util.constrainValue(calculatedSpeed, minPlaybackSpeed, maxPlaybackSpeed);
-}
-return adjustedPlaybackSpeed;&lt;/code&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;long&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;liveOffsetErrorUs&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;liveOffsetUs&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;currentTargetLiveOffsetUs&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="k"&gt;if&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Math&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;abs&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;liveOffsetErrorUs&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;maxLiveOffsetErrorUsForUnitSpeed&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;adjustedPlaybackSpeed&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;else&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="nb nb-Type"&gt;float&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;calculatedSpeed&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="n"&gt;f&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;+&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;proportionalControlFactor&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;*&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;liveOffsetErrorUs&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="w"&gt;  &lt;/span&gt;&lt;span class="n"&gt;adjustedPlaybackSpeed&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="w"&gt;      &lt;/span&gt;&lt;span class="n"&gt;Util&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;constrainValue&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;calculatedSpeed&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;minPlaybackSpeed&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;maxPlaybackSpeed&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;span class="k"&gt;return&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;adjustedPlaybackSpeed&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;&lt;span class="w"&gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
 &lt;/li&gt;
 &lt;/ol&gt;
 &lt;p&gt;&lt;a href="https://github.com/google/ExoPlayer/blob/r2.17.1/library/core/src/main/java/com/google/android/exoplayer2/DefaultLivePlaybackSpeedControl.java#L338-L361"&gt;DefaultLivePlaybackSpeedControl.java#L338-L361&lt;/a&gt;&lt;/p&gt;
