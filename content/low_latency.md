@@ -25,7 +25,7 @@ r2.17.1
 
     Playerを構成する際にビルダーに共通のライブ再生に関する位置調整のパラメータを設定するか、MediaItem毎に設定するかという2つの手段があります。
 
-- [LiveOffsetとは何か](./liveoffset.md)
+- [LiveOffsetとは何か]({filename}./liveoffset.md)
 
 # 再生位置調整機能
 

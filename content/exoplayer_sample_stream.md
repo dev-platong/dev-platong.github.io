@@ -41,11 +41,11 @@ FormatクラスとDrmSessionクラスを保持します。
 
 ##### Formatファイナルクラス
 
-[記事](./exoplayer_format.md)をご覧ください。
+[記事]({filename}./exoplayer_format.md)をご覧ください。
 
 #### DecoderInputBuffer
 
-[記事](./exoplayer_decoder_input_buffer.md)をご覧ください。
+[記事]({filename}./exoplayer_decoder_input_buffer.md)をご覧ください。
 
 #### ReadFlags
 

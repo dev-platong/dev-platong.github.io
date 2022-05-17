@@ -52,4 +52,4 @@ ExoPlayerでは、各クラスでprivate finalで実装されているリスナ�
 ## まとめ
 
 ExoPlayerImplやExoPlayerImplInternalで具体的な処理を行うため、SimpleExoではより付加価値的なクラス生成を行なっている。  
-明日は[ExoPlayer.setMediaItem()を追います。](./exoplayer_set_media_item.md)
+明日は[ExoPlayer.setMediaItem()を追います。]({filename}./exoplayer_set_media_item.md)
