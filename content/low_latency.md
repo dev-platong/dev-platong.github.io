@@ -1,6 +1,6 @@
 Title: ExoPlayerにおける低遅延再生の再生位置調整
 Date: 2022-5-15
-LastModified: 2022-5-16
+LastModified: 2022-5-17
 Category: ExoPlayer
 Authors: dev-platong
 
@@ -36,6 +36,116 @@ ExoPlayerではインターフェースがまず提供されていて、その�
 再生位置調整機能は、低遅延ストリームで通常で有効です。低遅延ではないライブストリームでは明治的に再生速度のMAX/MINを指定することで有効になります。 SEE: [r2.17.0 release note](https://github.com/google/ExoPlayer/releases/tag/r2.17.0#:~:text=Disable%20automatic%20speed%20adjustment%20for%20live%20streams%20that%20neither%20have%20low%2Dlatency%20features%20nor%20a%20user%20request%20setting%20the%20speed)
 
 注意： r2.13.0~2.16.1 では低遅延ではないライブストリームでも再生位置調整機能がデフォルトで有効でした。 SEE：https://github.com/google/ExoPlayer/issues/9329
+
+## 有効化
+
+### 低遅延の場合
+
+メディアプレイリストに `#EXT-X-SERVER-CONTROL` タグがあり、`PART-HOLD-BACK` または `HOLD-BACK` が設定されていることを確認してください。  
+
+```java
+boolean disableSpeedAdjustment =
+  mediaItem.liveConfiguration.minPlaybackSpeed == C.RATE_UNSET
+    && mediaItem.liveConfiguration.maxPlaybackSpeed == C.RATE_UNSET
+    && playlist.serverControl.holdBackUs == C.TIME_UNSET
+    && playlist.serverControl.partHoldBackUs == C.TIME_UNSET;
+```
+
+[HlsMediaSource.java#L569-L573](https://github.com/google/ExoPlayer/blob/r2.17.1//library/hls/src/main/java/com/google/android/exoplayer2/source/hls/HlsMediaSource.java#L569-L573)
+
+また、 `#EXT-X-PROGRAM-DATE-TIME` が設定されていることも確認してください。
+
+```java
+    return window.isLive() && window.isDynamic && window.windowStartTimeMs != C.TIME_UNSET;
+```
+
+[ExoPlayerImplInternal.java#L1125](https://github.com/google/ExoPlayer/blob/r2.17.1/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L1125)
+
+例：Apple LL-hls stream
+
+```
+#EXTM3U
+# Following the example above, this Playlist is a response to: GET https://example.com/2M/waitForMSN.php?_HLS_msn=273&_HLS_part=3 &_HLS_skip=YES
+#EXT-X-TARGETDURATION:4
+#EXT-X-VERSION:9
+#EXT-X-SERVER-CONTROL:CAN-BLOCK-RELOAD=YES,PART-HOLD-BACK=1.0,CAN-SKIP-UNTIL=12.0
+#EXT-X-PART-INF:PART-TARGET=0.33334
+#EXT-X-MEDIA-SEQUENCE:266
+#EXT-X-SKIP:SKIPPED-SEGMENTS=3
+#EXTINF:4.00008,
+fileSequence269.mp4
+#EXTINF:4.00008,
+fileSequence270.mp4
+#EXT-X-PART:DURATION=0.33334,URI="filePart271.0.mp4"
+#EXT-X-PART:DURATION=0.33334,URI="filePart271.1.mp4"
+#EXT-X-PART:DURATION=0.33334,URI="filePart271.2.mp4"
+#EXT-X-PART:DURATION=0.33334,URI="filePart271.3.mp4"
+#EXT-X-PART:DURATION=0.33334,URI="filePart271.4.mp4",INDEPENDENT=YES
+#EXT-X-PART:DURATION=0.33334,URI="filePart271.5.mp4"
+#EXT-X-PART:DURATION=0.33334,URI="filePart271.6.mp4"
+#EXT-X-PART:DURATION=0.33334,URI="filePart271.7.mp4"
+#EXT-X-PART:DURATION=0.33334,URI="filePart271.8.mp4",INDEPENDENT=YES
+#EXT-X-PART:DURATION=0.33334,URI="filePart271.9.mp4"
+#EXT-X-PART:DURATION=0.33334,URI="filePart271.10.mp4"
+#EXT-X-PART:DURATION=0.33334,URI="filePart271.11.mp4"
+#EXTINF:4.00008,
+fileSequence271.mp4
+#EXT-X-PROGRAM-DATE-TIME:2019-02-14T02:14:00.106Z
+#EXT-X-PART:DURATION=0.33334,URI="filePart272.a.mp4"
+#EXT-X-PART:DURATION=0.33334,URI="filePart272.b.mp4"
+#EXT-X-PART:DURATION=0.33334,URI="filePart272.c.mp4"
+#EXT-X-PART:DURATION=0.33334,URI="filePart272.d.mp4"
+#EXT-X-PART:DURATION=0.33334,URI="filePart272.e.mp4"
+#EXT-X-PART:DURATION=0.33334,URI="filePart272.f.mp4",INDEPENDENT=YES
+#EXT-X-PART:DURATION=0.33334,URI="filePart272.g.mp4"
+#EXT-X-PART:DURATION=0.33334,URI="filePart272.h.mp4"
+#EXT-X-PART:DURATION=0.33334,URI="filePart272.i.mp4"
+#EXT-X-PART:DURATION=0.33334,URI="filePart272.j.mp4"
+#EXT-X-PART:DURATION=0.33334,URI="filePart272.k.mp4"
+#EXT-X-PART:DURATION=0.33334,URI="filePart272.l.mp4"
+#EXTINF:4.00008,
+fileSequence272.mp4
+#EXT-X-PART:DURATION=0.33334,URI="filePart273.0.mp4",INDEPENDENT=YES
+#EXT-X-PART:DURATION=0.33334,URI="filePart273.1.mp4"
+#EXT-X-PART:DURATION=0.33334,URI="filePart273.2.mp4"
+#EXT-X-PART:DURATION=0.33334,URI="filePart273.3.mp4"
+#EXT-X-PRELOAD-HINT:TYPE=PART,URI="filePart273.4.mp4"
+
+#EXT-X-RENDITION-REPORT:URI="../1M/waitForMSN.php",LAST-MSN=273,LAST-PART=3
+#EXT-X-RENDITION-REPORT:URI="../4M/waitForMSN.php",LAST-MSN=273,LAST-PART=3
+```
+
+[2022年5月17日18:52 enabling_low-latency_http_live_streaming_hls](https://developer.apple.com/documentation/http_live_streaming/enabling_low-latency_http_live_streaming_hls)
+
+### 低遅延ではない場合
+
+1. MediaItemに `maxSpeed` と `minSpeed` を設定してください
+
+        MediaItem mediaItem =
+          new MediaItem.Builder()
+            .setUri(mediaUri)
+            .setLiveConfiguration(
+          new MediaItem.LiveConfiguration.Builder()
+            .setMaxPlaybackSpeed(1.02f)
+            .build())
+            .build();
+          player.setMediaItem(mediaItem);
+
+[live-streaming.md#L106-L114](https://github.com/google/ExoPlayer/blame/r2.17.1/docs/live-streaming.md#L106-L114)
+
+2. MediaPlaylistに `#EXT-X-PROGRAM-DATE` タグが存在することを確認してください
+
+       private boolean shouldUseLivePlaybackSpeedControl(
+         Timeline timeline, MediaPeriodId mediaPeriodId) {
+         if (mediaPeriodId.isAd() || timeline.isEmpty()) {
+           return false;
+         }
+         int windowIndex = timeline.getPeriodByUid(mediaPeriodId.periodUid, period).windowIndex;
+         timeline.getWindow(windowIndex, window);
+         return window.isLive() && window.isDynamic && window.windowStartTimeMs != C.TIME_UNSET;
+       }
+
+[ExoPlayerImplInternal.java#L1118-L1126](https://github.com/google/ExoPlayer/blob/r2.17.1/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L1118-L1126)
 
 ## LivePlaybackSpeedControl インターフェース
 
