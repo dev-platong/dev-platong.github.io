@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="generator" content="Pelican" />
+        <title>ExoPlayerにおけるLiveOffset</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="dev-platong's home Atom Feed" />
+        <meta name="description" content="Overview ライブ再生に存在する概念であるライブオフセットについて扱います。 ライブオフセットとは何か ライブオフセ …" />
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">dev-platong's home</a></h1>
+                <nav><ul>
+                    <li><a href="/pages/dev-platongs-home.html">dev-platong's home</a></li>
+                    <li><a href="/category/android-exoplayer.html">Android, ExoPlayer</a></li>
+                    <li class="active"><a href="/category/exoplayer.html">ExoPlayer</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/exoplayerniokeruliveoffset.html" rel="bookmark"
+           title="Permalink to ExoPlayerにおけるLiveOffset">ExoPlayerにおけるLiveOffset</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2022-02-25T00:00:00+09:00">
+                Published: 金 25 2月 2022
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/dev-platong.html">dev-platong</a>
+        </address>
+<p>In <a href="/category/exoplayer.html">ExoPlayer</a>.</p>
+
+</footer><!-- /.post-info -->      <h1>Overview</h1>
+<p>ライブ再生に存在する概念であるライブオフセットについて扱います。  </p>
+<ul>
+<li>ライブオフセットとは何か</li>
+<li>ライブオフセットの決まり方</li>
+</ul>
+<h1>LiveOffsetとは</h1>
+<p>LiveOffsetは、現在の時刻から再生位置が何秒遅れているかを示します。 FROM: <a href="https://github.com/google/ExoPlayer/blame/r2.17.1/docs/live-streaming.md#L11-L12">live-streaming.md#L11-L12</a></p>
+<p><img src="../images/getLiveOffsetUs.jpg" alt="ExoPlayerImplInternal Line 1108 getLiveOffsetUs function"/></p>
+<p><a href="https://github.com/google/ExoPlayer/blob/r2.17.1/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L1114-L1115">ExoPlayerImplInternal.java#L1114-L1115</a></p>
+<p><code>Player.getCurrentLiveOffset()</code> で取得できます。 SEE: <a href="https://exoplayer.dev/doc/reference/com/google/android/exoplayer2/Player.html#getCurrentLiveOffset()">Player.html#getCurrentLiveOffset()</a></p>
+<h1>LiveOffsetの決まり方</h1>
+<h2>HLSの場合</h2>
+<p>採択されるアルゴリズムにも優先順位がある。</p>
+<ol>
+<li>
+<h1>EXT-X-START がある場合</h1>
+</li>
+</ol>
+<p>マスタープレイリストまたはメディアプレイリストに記載される可能性があるタグです。<br>
+記載されたプレイリストからの相対位置または、絶対位置で定義できます（絶対位置はおそらくMasterPlaylistに記載する想定だと思われます）。  </p>
+<h1>EXT-X-ENDLISTタグがプレイリストに含まれていない場合（ライブ再生）ではTARGET DURATIONの3倍以下の値を設定すべきではないことが示されています。</h1>
+<p><a href="https://datatracker.ietf.org/doc/html/rfc8216#section-4.3.5.2">rfc8216#section-4.3.5.2</a>で規定されています。</p>
+<ol>
+<li>
+<h1>EXT-X-SERVER-CONTROLにPART-HOLD-BACKが設定されていて、part target durationがある場合</h1>
+</li>
+</ol>
+<p>Media Playlist限定のタグです。低遅延モードの時のプレイリストの終わりからの最小再生位置を示します。この値は最低でもPART TARGET DURATIONの2倍でなければいけません。また、PART TARGET DURATIONの3倍以上であるべきです。　　
+もし異なるレンディションが異なるPART TARGET DURATIONsを持っているならば、PART-HOLD-BACKは最低でもPART TARGET DURATIONの3倍であるべきです。</p>
+<p><a href="https://datatracker.ietf.org/doc/html/draft-pantos-hls-rfc8216bis#section-4.4.3.8">draft-pantos-hls-rfc8216bis#section-4.4.3.8</a></p>
+<p>PART TARGET DURATION</p>
+<p><a href="https://datatracker.ietf.org/doc/html/draft-pantos-hls-rfc8216bis#section-4.4.3.7">draft-pantos-hls-rfc8216bis#section-4.4.3.7</a></p>
+<ol>
+<li>
+<h1>EXT-X-SERVER-CONTROLにHOLD-BACKが設定されている場合</h1>
+</li>
+</ol>
+<p>Media Playlist限定のタグです。プレイリストの終わりからの最小再生位置を示します。</p>
+<p><a href="https://datatracker.ietf.org/doc/html/draft-pantos-hls-rfc8216bis#section-4.4.3.8">draft-pantos-hls-rfc8216bis#section-4.4.3.8</a></p>
+<ol>
+<li>上記の項目が該当しない時</li>
+</ol>
+<p>TARGET DURATIONの3倍になります。</p>
+<p><a href="https://datatracker.ietf.org/doc/html/draft-pantos-hls-rfc8216bis-09#:~:text=Its%20absence%20implies%20a%20value%20of%20three%0A%20%20%20%20%20%20times%20the%20Target%20Duration.">HLS spec 4.4.3.8</a></p>
+<div class="highlight"><pre><span></span><code>  <span class="cm">/**</span>
+<span class="cm">   * Gets the target live offset, in microseconds, for a live playlist.</span>
+<span class="cm">   *</span>
+<span class="cm">   * &lt;p&gt;The target offset is derived by checking the following in this order:</span>
+<span class="cm">   *</span>
+<span class="cm">   * &lt;ol&gt;</span>
+<span class="cm">   *   &lt;li&gt;The playlist defines a start offset.</span>
+<span class="cm">   *   &lt;li&gt;The playlist defines a part hold back in server control and has part duration.</span>
+<span class="cm">   *   &lt;li&gt;The playlist defines a hold back in server control.</span>
+<span class="cm">   *   &lt;li&gt;Fallback to {@code 3 x target duration}.</span>
+<span class="cm">   * &lt;/ol&gt;</span>
+<span class="cm">   *</span>
+<span class="cm">   * @param playlist The playlist.</span>
+<span class="cm">   * @param liveEdgeOffsetUs The current live edge offset.</span>
+<span class="cm">   * @return The selected target live offset, in microseconds.</span>
+<span class="cm">   */</span>
+  <span class="kd">private</span> <span class="kd">static</span> <span class="kt">long</span> <span class="nf">getTargetLiveOffsetUs</span><span class="p">(</span><span class="n">HlsMediaPlaylist</span> <span class="n">playlist</span><span class="p">,</span> <span class="kt">long</span> <span class="n">liveEdgeOffsetUs</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">HlsMediaPlaylist</span><span class="p">.</span><span class="na">ServerControl</span> <span class="n">serverControl</span> <span class="o">=</span> <span class="n">playlist</span><span class="p">.</span><span class="na">serverControl</span><span class="p">;</span>
+    <span class="kt">long</span> <span class="n">targetOffsetUs</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">playlist</span><span class="p">.</span><span class="na">startOffsetUs</span> <span class="o">!=</span> <span class="n">C</span><span class="p">.</span><span class="na">TIME_UNSET</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">targetOffsetUs</span> <span class="o">=</span> <span class="n">playlist</span><span class="p">.</span><span class="na">durationUs</span> <span class="o">-</span> <span class="n">playlist</span><span class="p">.</span><span class="na">startOffsetUs</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">serverControl</span><span class="p">.</span><span class="na">partHoldBackUs</span> <span class="o">!=</span> <span class="n">C</span><span class="p">.</span><span class="na">TIME_UNSET</span>
+        <span class="o">&amp;&amp;</span> <span class="n">playlist</span><span class="p">.</span><span class="na">partTargetDurationUs</span> <span class="o">!=</span> <span class="n">C</span><span class="p">.</span><span class="na">TIME_UNSET</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// Select part hold back only if the playlist has a part target duration.</span>
+      <span class="n">targetOffsetUs</span> <span class="o">=</span> <span class="n">serverControl</span><span class="p">.</span><span class="na">partHoldBackUs</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">serverControl</span><span class="p">.</span><span class="na">holdBackUs</span> <span class="o">!=</span> <span class="n">C</span><span class="p">.</span><span class="na">TIME_UNSET</span><span class="p">)</span> <span class="p">{</span>
+      <span class="n">targetOffsetUs</span> <span class="o">=</span> <span class="n">serverControl</span><span class="p">.</span><span class="na">holdBackUs</span><span class="p">;</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="c1">// Fallback, see RFC 8216, Section 4.4.3.8.</span>
+      <span class="n">targetOffsetUs</span> <span class="o">=</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">playlist</span><span class="p">.</span><span class="na">targetDurationUs</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">targetOffsetUs</span> <span class="o">+</span> <span class="n">liveEdgeOffsetUs</span><span class="p">;</span>
+  <span class="p">}</span>
+</code></pre></div>
+
+<p><a href="https://github.com/google/ExoPlayer/blob/r2.17.1/library/hls/src/main/java/com/google/android/exoplayer2/source/hls/HlsMediaSource.java#L582-L614">HlsMediaSource.java#L582-L614</a></p>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>links</h2>
+                        <ul>
+                            <li><a href="https://getpelican.com/">Pelican</a></li>
+                            <li><a href="https://www.python.org/">Python.org</a></li>
+                            <li><a href="https://palletsprojects.com/p/jinja/">Jinja2</a></li>
+                            <li><a href="#">You can modify those links in your config file</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+                            <li><a href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="#">You can add links in your config file</a></li>
+                            <li><a href="#">Another social link</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a href="https://www.python.org/">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>

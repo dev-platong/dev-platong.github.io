@@ -15,7 +15,7 @@
                 <nav><ul>
                     <li><a href="/pages/dev-platongs-home.html">dev-platong's home</a></li>
                     <li class="active"><a href="/category/android-exoplayer.html">Android, ExoPlayer</a></li>
-                    <li><a href="/category/android-exoplayer-low-latency-ll-hls.html">Android, ExoPlayer, Low-Latency, LL-hls</a></li>
+                    <li><a href="/category/exoplayer.html">ExoPlayer</a></li>
                 </ul></nav>
         </header><!-- /#banner -->
 
@@ -276,14 +276,14 @@ Rendererがデータを読み込んでいるSampleStreamに …</p>
 
             <li><article class="hentry">
                 <header>
-                    <h1><a href="/exoplayerniokeruliveoffsettohahe-ka.html" rel="bookmark"
-                           title="Permalink to ExoPlayerにおけるLiveOffsetとは何か">ExoPlayerにおけるLiveOffsetとは何か</a></h1>
+                    <h1><a href="/exoplayerimplinternalnoju-dong-wozhui-usheng-cheng-mawari.html" rel="bookmark"
+                           title="Permalink to ExoPlayerImplInternalの挙動を追う（生成まわり）">ExoPlayerImplInternalの挙動を追う（生成まわり）</a></h1>
                 </header>
 
                 <div class="entry-content">
 <footer class="post-info">
-        <abbr class="published" title="2023-02-25T00:00:00+09:00">
-                Published: 土 25 2月 2023
+        <abbr class="published" title="2023-02-24T00:00:00+09:00">
+                Published: 金 24 2月 2023
         </abbr>
 
         <address class="vcard author">
@@ -291,13 +291,13 @@ Rendererがデータを読み込んでいるSampleStreamに …</p>
         </address>
 <p>In <a href="/category/android-exoplayer.html">Android, ExoPlayer</a>.</p>
 
-</footer><!-- /.post-info -->                <h1>Overview</h1>
-<p>Live edgeとは何か</p>
-<h1>詳細</h1>
-<p>LiveOffsetは、 <code>TARGET DURATION</code> の3倍になる。</p>
-<p>これはRFC8216（HLSのspec）で規定されている。SEE: <a href="https://datatracker.ietf.org/doc/html/draft-pantos-hls-rfc8216bis-09#:~:text=Its%20absence%20implies%20a%20value%20of%20three%0A%20%20%20%20%20%20times%20the%20Target%20Duration.">HLS spec 4.4.3.8</a></p>
-<p>HLSのTarget Durationは<a href="https://gnzo.com/labo/archives/646#:~:text=The%20EXT-X-TARGETDURATION,%E9%81%A9%E7%94%A8%E3%81%95%E3%82%8C%E3%81%BE%E3%81%99%E3%80%82">セグメン …</a></p>
-                <a class="readmore" href="/exoplayerniokeruliveoffsettohahe-ka.html">read more</a>
+</footer><!-- /.post-info -->                <h2>ExoPlayerImplInternalの生成時</h2>
+<h3>LoadControl関連</h3>
+<p>LoadControl から 巻き戻し関連の値を取得する。</p>
+<p><a href="https://github.com/google/ExoPlayer/blob/r2.16.1/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L248-L249">ExoPlayerImplInternal.java#L248-L249</a></p>
+<h3>PlaybackInfo関連</h3>
+<p>ダミーのPlaybackInfoインスタンスと、それに基づく PlaybackInfoUpdateク …</p>
+                <a class="readmore" href="/exoplayerimplinternalnoju-dong-wozhui-usheng-cheng-mawari.html">read more</a>
                 </div><!-- /.entry-content -->
             </article></li>
                 </ol><!-- /#posts-list -->

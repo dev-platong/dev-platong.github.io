@@ -16,7 +16,7 @@
                 <nav><ul>
                     <li><a href="/pages/dev-platongs-home.html">dev-platong's home</a></li>
                     <li><a href="/category/android-exoplayer.html">Android, ExoPlayer</a></li>
-                    <li class="active"><a href="/category/android-exoplayer-low-latency-ll-hls.html">Android, ExoPlayer, Low-Latency, LL-hls</a></li>
+                    <li class="active"><a href="/category/exoplayer.html">ExoPlayer</a></li>
                 </ul></nav>
         </header><!-- /#banner -->
 <section id="content" class="body">
@@ -29,18 +29,18 @@
 
     <div class="entry-content">
 <footer class="post-info">
-        <abbr class="published" title="2023-05-15T00:00:00+09:00">
-                Published: 月 15 5月 2023
+        <abbr class="published" title="2022-05-15T00:00:00+09:00">
+                Published: 日 15 5月 2022
         </abbr>
 
         <address class="vcard author">
                 By                         <a class="url fn" href="/author/dev-platong.html">dev-platong</a>
         </address>
-<p>In <a href="/category/android-exoplayer-low-latency-ll-hls.html">Android, ExoPlayer, Low-Latency, LL-hls</a>.</p>
+<p>In <a href="/category/exoplayer.html">ExoPlayer</a>.</p>
 
 </footer><!-- /.post-info -->      <h1>Overview</h1>
 <p>ExoPlayerにおける低遅延サポートについて、再生位置調整機能だけが低遅延に特有であると仮定してその詳細をまとめます。
-<code>DefaultLivePlaybackSpeedControl</code> が最も関係する実クラスで、過去の計算結果を考慮する緩やかな変化を再生速度とライブオフセットに加える設計になっています。</p>
+<code>DefaultLivePlaybackSpeedControl</code> が最も関係する実クラスで、バッファの状態を考慮し、過去の計算結果を考慮する緩やかな変化を再生速度とライブオフセットに加える設計になっています。</p>
 <h1>前提</h1>
 <h2>使用バージョン</h2>
 <p>r2.17.1</p>
@@ -53,6 +53,9 @@
 <li>
 <p><a href="https://github.com/google/ExoPlayer/blob/r2.17.1/docs/live-streaming.md">exoplayer.devのLiveStreamingのdocs</a></p>
 <p>Playerを構成する際にビルダーに共通のライブ再生に関する位置調整のパラメータを設定するか、MediaItem毎に設定するかという2つの手段があります。</p>
+</li>
+<li>
+<p><a href="./liveoffset.md">LiveOffsetとは何か</a></p>
 </li>
 </ul>
 <h1>再生位置調整機能</h1>
