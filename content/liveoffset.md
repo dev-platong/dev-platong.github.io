@@ -96,3 +96,59 @@ LiveOffsetは、現在の時刻から再生位置が何秒遅れているかを�
 ```
 
 [HlsMediaSource.java#L582-L614](https://github.com/google/ExoPlayer/blob/r2.17.1/library/hls/src/main/java/com/google/android/exoplayer2/source/hls/HlsMediaSource.java#L582-L614)
+
+## LiveEdgeOffsetとは
+
+`#EXT-X-PROGRAM-DATE-TIME` タグが存在する場合に算出されます。存在しない場合値は0になります。
+このタグは1つ目のサンプルに関連する時刻を示します。ExoPlayerではstartTimeUsの算出に用いられます。
+
+```java
+  /**
+   * If {@link #hasProgramDateTime} is true, contains the datetime as microseconds since epoch.
+   * Otherwise, contains the aggregated duration of removed segments up to this snapshot of the
+   * playlist.
+   */
+  public final long startTimeUs;
+```
+
+[HlsMediaPlaylist.java#L413-L418](https://github.com/google/ExoPlayer/blob/r2.17.1/library/hls/src/main/java/com/google/android/exoplayer2/source/hls/playlist/HlsMediaPlaylist.java#L413-L418)
+
+以下の関数で算出される時、duraionUsはLiveのプレイリストの場合、メディアプレイリストに記載されているセグメントの全体長になります。例えば以下のようなメディアプレイリストが与えられたならば、`durationUs` は `4004000` Us になります。
+
+```
+   1   | #EXTM3U
+   2   │ #EXT-X-VERSION:3
+   3   │ #EXT-X-TARGETDURATION:1
+   4   │ #EXT-X-MEDIA-SEQUENCE:4141834
+   5   │ #EXT-X-DISCONTINUITY-SEQUENCE:31321
+   6   │ #EXT-X-KEY:METHOD=AES-128,URI="https://xxxxxxxx.s3-ap-northeast-1.amazonaws.com/hls-aes128/aes128.key",IV=0x00000000000000000000000000000009
+   7   │ #EXTINF:1.0010,
+   8   │ /segment/hogehoge
+   9   │ #EXTINF:1.0010,
+  10   │ /segment/hogehoge
+  11   │ #EXTINF:1.0010,
+  12   │ /segment/hogehoge
+  13   │ #EXTINF:1.0010,
+  14   │ /segment/hogehoge
+```
+
+```java
+  /** Returns the result of adding the duration of the playlist to its start time. */
+  public long getEndTimeUs() {
+    return startTimeUs + durationUs;
+  }
+```
+
+https://github.com/google/ExoPlayer/blob/r2.17.1/library/hls/src/main/java/com/google/android/exoplayer2/source/hls/playlist/HlsMediaPlaylist.java#L570-L573
+
+そして最終的にLiveEdgeが算出されます。お疲れ様でした。
+
+<img src="./images/getLiveEdgeOffsetUs.jpg" alt="LiveEdgeOffset figure"/>
+
+```java
+  private long getLiveEdgeOffsetUs(HlsMediaPlaylist playlist) {
+    return playlist.hasProgramDateTime
+        ? Util.msToUs(Util.getNowUnixTimeMs(elapsedRealTimeOffsetMs)) - playlist.getEndTimeUs()
+        : 0;
+  }
+```
