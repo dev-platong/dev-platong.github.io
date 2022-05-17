@@ -7,7 +7,7 @@ Authors: dev-platong
 # Overview
 
 ExoPlayerにおける低遅延サポートについて、再生位置調整機能だけが低遅延に特有であると仮定してその詳細をまとめます。
-`DefaultLivePlaybackSpeedControl` が最も関係する実クラスで、過去の計算結果を考慮する緩やかな変化を再生速度とライブオフセットに加える設計になっています。
+`DefaultLivePlaybackSpeedControl` が最も関係する実クラスで、バッファの状態を考慮し、過去の計算結果を考慮する緩やかな変化を再生速度とライブオフセットに加える設計になっています。
 
 # 前提
 
