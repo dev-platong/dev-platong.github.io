@@ -1004,4 +1004,48 @@ the renderer is ready for playback to be started. Returning false indicates that
   &lt;span class="p"&gt;}&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
 
-&lt;p&gt;&lt;a href="https://github.com/google/ExoPlayer/blob/r2.17.1/library/hls/src/main/java/com/google/android/exoplayer2/source/hls/HlsMediaSource.java#L582-L614"&gt;HlsMediaSource.java#L582-L614&lt;/a&gt;&lt;/p&gt;</content><category term="ExoPlayer"></category></entry></feed>
+&lt;p&gt;&lt;a href="https://github.com/google/ExoPlayer/blob/r2.17.1/library/hls/src/main/java/com/google/android/exoplayer2/source/hls/HlsMediaSource.java#L582-L614"&gt;HlsMediaSource.java#L582-L614&lt;/a&gt;&lt;/p&gt;
+&lt;h2&gt;LiveEdgeOffsetとは&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;#EXT-X-PROGRAM-DATE-TIME&lt;/code&gt; タグが存在する場合に算出されます。存在しない場合値は0になります。
+このタグは1つ目のサンプルに関連する時刻を示します。ExoPlayerではstartTimeUsの算出に用いられます。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;  &lt;span class="cm"&gt;/**&lt;/span&gt;
+&lt;span class="cm"&gt;   * If {@link #hasProgramDateTime} is true, contains the datetime as microseconds since epoch.&lt;/span&gt;
+&lt;span class="cm"&gt;   * Otherwise, contains the aggregated duration of removed segments up to this snapshot of the&lt;/span&gt;
+&lt;span class="cm"&gt;   * playlist.&lt;/span&gt;
+&lt;span class="cm"&gt;   */&lt;/span&gt;
+  &lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kd"&gt;final&lt;/span&gt; &lt;span class="kt"&gt;long&lt;/span&gt; &lt;span class="n"&gt;startTimeUs&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;a href="https://github.com/google/ExoPlayer/blob/r2.17.1/library/hls/src/main/java/com/google/android/exoplayer2/source/hls/playlist/HlsMediaPlaylist.java#L413-L418"&gt;HlsMediaPlaylist.java#L413-L418&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;以下の関数で算出される時、duraionUsはLiveのプレイリストの場合、メディアプレイリストに記載されているセグメントの全体長になります。例えば以下のようなメディアプレイリストが与えられたならば、&lt;code&gt;durationUs&lt;/code&gt; は &lt;code&gt;4004000&lt;/code&gt; Us になります。&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;   1   | #EXTM3U
+   2   │ #EXT-X-VERSION:3
+   3   │ #EXT-X-TARGETDURATION:1
+   4   │ #EXT-X-MEDIA-SEQUENCE:4141834
+   5   │ #EXT-X-DISCONTINUITY-SEQUENCE:31321
+   6   │ #EXT-X-KEY:METHOD=AES-128,URI=&amp;quot;https://xxxxxxxx.s3-ap-northeast-1.amazonaws.com/hls-aes128/aes128.key&amp;quot;,IV=0x00000000000000000000000000000009
+   7   │ #EXTINF:1.0010,
+   8   │ /segment/hogehoge
+   9   │ #EXTINF:1.0010,
+  10   │ /segment/hogehoge
+  11   │ #EXTINF:1.0010,
+  12   │ /segment/hogehoge
+  13   │ #EXTINF:1.0010,
+  14   │ /segment/hogehoge
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;  &lt;span class="cm"&gt;/** Returns the result of adding the duration of the playlist to its start time. */&lt;/span&gt;
+  &lt;span class="kd"&gt;public&lt;/span&gt; &lt;span class="kt"&gt;long&lt;/span&gt; &lt;span class="nf"&gt;getEndTimeUs&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;startTimeUs&lt;/span&gt; &lt;span class="o"&gt;+&lt;/span&gt; &lt;span class="n"&gt;durationUs&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+  &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+&lt;p&gt;https://github.com/google/ExoPlayer/blob/r2.17.1/library/hls/src/main/java/com/google/android/exoplayer2/source/hls/playlist/HlsMediaPlaylist.java#L570-L573&lt;/p&gt;
+&lt;p&gt;そして最終的にLiveEdgeが算出されます。お疲れ様でした。&lt;/p&gt;
+&lt;p&gt;&lt;img src="./images/getLiveEdgeOffsetUs.jpg" alt="LiveEdgeOffset figure"/&gt;&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;  &lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="kt"&gt;long&lt;/span&gt; &lt;span class="nf"&gt;getLiveEdgeOffsetUs&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;HlsMediaPlaylist&lt;/span&gt; &lt;span class="n"&gt;playlist&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;playlist&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;hasProgramDateTime&lt;/span&gt;
+        &lt;span class="o"&gt;?&lt;/span&gt; &lt;span class="n"&gt;Util&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;msToUs&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Util&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;getNowUnixTimeMs&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;elapsedRealTimeOffsetMs&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;playlist&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;getEndTimeUs&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+        &lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+  &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="ExoPlayer"></category></entry></feed>

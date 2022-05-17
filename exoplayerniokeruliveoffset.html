@@ -114,6 +114,50 @@
 </code></pre></div>
 
 <p><a href="https://github.com/google/ExoPlayer/blob/r2.17.1/library/hls/src/main/java/com/google/android/exoplayer2/source/hls/HlsMediaSource.java#L582-L614">HlsMediaSource.java#L582-L614</a></p>
+<h2>LiveEdgeOffsetとは</h2>
+<p><code>#EXT-X-PROGRAM-DATE-TIME</code> タグが存在する場合に算出されます。存在しない場合値は0になります。
+このタグは1つ目のサンプルに関連する時刻を示します。ExoPlayerではstartTimeUsの算出に用いられます。</p>
+<div class="highlight"><pre><span></span><code>  <span class="cm">/**</span>
+<span class="cm">   * If {@link #hasProgramDateTime} is true, contains the datetime as microseconds since epoch.</span>
+<span class="cm">   * Otherwise, contains the aggregated duration of removed segments up to this snapshot of the</span>
+<span class="cm">   * playlist.</span>
+<span class="cm">   */</span>
+  <span class="kd">public</span> <span class="kd">final</span> <span class="kt">long</span> <span class="n">startTimeUs</span><span class="p">;</span>
+</code></pre></div>
+
+<p><a href="https://github.com/google/ExoPlayer/blob/r2.17.1/library/hls/src/main/java/com/google/android/exoplayer2/source/hls/playlist/HlsMediaPlaylist.java#L413-L418">HlsMediaPlaylist.java#L413-L418</a></p>
+<p>以下の関数で算出される時、duraionUsはLiveのプレイリストの場合、メディアプレイリストに記載されているセグメントの全体長になります。例えば以下のようなメディアプレイリストが与えられたならば、<code>durationUs</code> は <code>4004000</code> Us になります。</p>
+<div class="highlight"><pre><span></span><code>   1   | #EXTM3U
+   2   │ #EXT-X-VERSION:3
+   3   │ #EXT-X-TARGETDURATION:1
+   4   │ #EXT-X-MEDIA-SEQUENCE:4141834
+   5   │ #EXT-X-DISCONTINUITY-SEQUENCE:31321
+   6   │ #EXT-X-KEY:METHOD=AES-128,URI=&quot;https://xxxxxxxx.s3-ap-northeast-1.amazonaws.com/hls-aes128/aes128.key&quot;,IV=0x00000000000000000000000000000009
+   7   │ #EXTINF:1.0010,
+   8   │ /segment/hogehoge
+   9   │ #EXTINF:1.0010,
+  10   │ /segment/hogehoge
+  11   │ #EXTINF:1.0010,
+  12   │ /segment/hogehoge
+  13   │ #EXTINF:1.0010,
+  14   │ /segment/hogehoge
+</code></pre></div>
+
+<div class="highlight"><pre><span></span><code>  <span class="cm">/** Returns the result of adding the duration of the playlist to its start time. */</span>
+  <span class="kd">public</span> <span class="kt">long</span> <span class="nf">getEndTimeUs</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">startTimeUs</span> <span class="o">+</span> <span class="n">durationUs</span><span class="p">;</span>
+  <span class="p">}</span>
+</code></pre></div>
+
+<p>https://github.com/google/ExoPlayer/blob/r2.17.1/library/hls/src/main/java/com/google/android/exoplayer2/source/hls/playlist/HlsMediaPlaylist.java#L570-L573</p>
+<p>そして最終的にLiveEdgeが算出されます。お疲れ様でした。</p>
+<p><img src="./images/getLiveEdgeOffsetUs.jpg" alt="LiveEdgeOffset figure"/></p>
+<div class="highlight"><pre><span></span><code>  <span class="kd">private</span> <span class="kt">long</span> <span class="nf">getLiveEdgeOffsetUs</span><span class="p">(</span><span class="n">HlsMediaPlaylist</span> <span class="n">playlist</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> <span class="n">playlist</span><span class="p">.</span><span class="na">hasProgramDateTime</span>
+        <span class="o">?</span> <span class="n">Util</span><span class="p">.</span><span class="na">msToUs</span><span class="p">(</span><span class="n">Util</span><span class="p">.</span><span class="na">getNowUnixTimeMs</span><span class="p">(</span><span class="n">elapsedRealTimeOffsetMs</span><span class="p">))</span> <span class="o">-</span> <span class="n">playlist</span><span class="p">.</span><span class="na">getEndTimeUs</span><span class="p">()</span>
+        <span class="p">:</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="p">}</span>
+</code></pre></div>
     </div><!-- /.entry-content -->
 
   </article>
