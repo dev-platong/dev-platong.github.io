@@ -45,7 +45,7 @@ ExoPlayerではインターフェースがまず提供されていて、その�
 
 `MediaItem` から渡ってくる `LiveConfiguration` のセッター。
 
-```
+```java
   /**
    * Sets the live configuration defined by the media.
    *
@@ -60,7 +60,7 @@ ExoPlayerではインターフェースがまず提供されていて、その�
 
 `LiveConfiguration` 経由で targetLiveOffset が設定されている場合に targetLiveOffsetをオーバーライドするメソッドです。
 
-```
+```java
 /**
    * Sets the target live offset in microseconds that overrides the live offset {@link
    * #setLiveConfiguration configured} by the media. Passing {@code C.TIME_UNSET} deletes a previous
@@ -77,7 +77,7 @@ ExoPlayerではインターフェースがまず提供されていて、その�
 
 ユーザーインタラクションではなくバッファの不足によるリバッファリングを通知します。ただし、最初のバッファリングとシークによるバッファリング時にはこのメソッドは呼び出されません。
 
-```
+```java
   /**
    * Notifies the live playback speed control that a rebuffer occurred.
    *
@@ -112,7 +112,7 @@ ExoPlayerではインターフェースがまず提供されていて、その�
 
 現在のターゲットオフセットを返します。この値は初めにMediaItemから渡された値ではなく、調整を続けて変動した値になります。
 
-```
+```java
   /**
    * Returns the current target live offset, in microseconds, or {@link C#TIME_UNSET} if no target
    * live offset is defined for the current media.
@@ -148,7 +148,7 @@ idealTargetOffsetの値を更新します。
 
 更新処理は以下の通りです。以前の値を考慮する計算になっているため、targetLiveOffsetの計算に利用される「以前のデータ」をクリアし、内部の状態を1度目の計算に適する形に戻します。
 
-```
+```java
 idealTargetLiveOffsetUs = idealOffsetUs;
 currentTargetLiveOffsetUs = idealOffsetUs;
 smoothedMinPossibleLiveOffsetUs = C.TIME_UNSET;
@@ -168,7 +168,7 @@ lastPlaybackSpeedUpdateMs = C.TIME_UNSET;
 
 このため、`変化後の値:前` を `1:999` の割合で足し合わせます。ほとんど変化しないということです。
 
-```
+```java
 private static long smooth(long smoothedValue, long newValue, float smoothingFactor) {
     return (long) (smoothingFactor * smoothedValue + (1f - smoothingFactor) * newValue);
   }
@@ -182,7 +182,7 @@ private static long smooth(long smoothedValue, long newValue, float smoothingFac
 
 1. バッファを使い切る最も攻めた `minPossibleLiveOffsetUs` を計算します。
 
-    ```
+    ```java
     long minPossibleLiveOffsetUs = liveOffsetUs - bufferedDurationUs;
     ```
 
@@ -190,7 +190,7 @@ private static long smooth(long smoothedValue, long newValue, float smoothingFac
 
     この時、`smoothedMinPossibleLiveOffsetDeviationUs` は 0に設定します。
 
-    ```
+    ```java
     if (smoothedMinPossibleLiveOffsetUs == C.TIME_UNSET) {
       smoothedMinPossibleLiveOffsetUs = minPossibleLiveOffsetUs;
       smoothedMinPossibleLiveOffsetDeviationUs = 0;
@@ -201,7 +201,7 @@ private static long smooth(long smoothedValue, long newValue, float smoothingFac
 
     この時、`smoothedMinPossibleLiveOffsetUs`は1秒以上前の計算結果である一方で、`minPossibleLiveOffsetUs` はバッファを考慮した今回の値であることに注意してください。
 
-    ```
+    ```java
     // Use the maximum here to ensure we keep track of the upper bound of what is safely possible,
       // not the average.
       smoothedMinPossibleLiveOffsetUs =
@@ -215,7 +215,7 @@ private static long smooth(long smoothedValue, long newValue, float smoothingFac
 
 4. `smoothedMinPossibleLiveOffsetDeviationUs` を計算します。
 
-    ```
+    ```java
     long minPossibleLiveOffsetDeviationUs =
           abs(minPossibleLiveOffsetUs - smoothedMinPossibleLiveOffsetUs);
       smoothedMinPossibleLiveOffsetDeviationUs =
@@ -233,7 +233,7 @@ private static long smooth(long smoothedValue, long newValue, float smoothingFac
 
     推測：前回とのliveOffsetの変化差分が3倍以上になるケースはほとんどないということを意味しているのだと思います。このケースに対応できないのは、3GネットワークからWi-fiに接続先が切り替わり、ネットワークの速度が劇的に改善する場合などです。
 
-    ```
+    ```java
     // Stay in a safe distance (3 standard deviations = >99%) to the minimum possible live offset.
     long safeOffsetUs =
         smoothedMinPossibleLiveOffsetUs + 3 * smoothedMinPossibleLiveOffsetDeviationUs;
@@ -241,7 +241,7 @@ private static long smooth(long smoothedValue, long newValue, float smoothingFac
 
 2. currentTargetOffsetがsafeOffsetより長いかを判断して処理を分岐させます。
 
-    ```
+    ```java
     if (currentTargetLiveOffsetUs > safeOffsetUs) {
     ```
 
@@ -251,7 +251,7 @@ private static long smooth(long smoothedValue, long newValue, float smoothingFac
 
     おそらく、 `minUpdateIntervalUs` を掛けているのは、値が大きくなると更新頻度が落ちるので、それを考慮して一回あたりの影響を上げるためだと思います。
 
-    ```
+    ```java
       // There is room for decreasing the target offset towards the ideal or safe offset (whichever
       // is larger). We want to limit the decrease so that the playback speed delta we achieve is
       // the same as the maximum delta when slowing down towards the target.
@@ -268,7 +268,7 @@ private static long smooth(long smoothedValue, long newValue, float smoothingFac
 
     考察：調整済み速度が1倍を下回る場合、目指すべきオフセットは `liveOffset` （本メソッドの引数に渡されているOffset）です。 `proportionalControlFactor` で割る理由は、速度変化が `proportionalControlFactor` に影響を受けて現在の状況が減らされて反映されるため、それを元に戻すためだと推察されます。
 
-    ```
+    ```java
     // We'd like to reach a stable condition where the current live offset stays just below the
       // safe offset. But don't increase the target offset to more than what would allow us to slow
       // down gradually from the current offset.
@@ -278,7 +278,7 @@ private static long smooth(long smoothedValue, long newValue, float smoothingFac
 
 5. `currentTargetLiveOffset` と `safeOffset` の間に先ほど計算した `offsetWhenSlowingDownNowUs` があるならばそれを採用します。
 
-    ```
+    ```java
     currentTargetLiveOffsetUs =
           Util.constrainValue(offsetWhenSlowingDownNowUs, currentTargetLiveOffsetUs, safeOffsetUs);
     ```
@@ -291,7 +291,7 @@ liveOffsetとバッファの長さを渡す必要があります。
 
 1. `MediaItem.LiveConfiguration`に値が指定されていなければアーリーリターンします。
 
-    ```
+    ```java
     if (mediaConfigurationTargetLiveOffsetUs == C.TIME_UNSET) {
       return 1f;
     }
@@ -299,13 +299,13 @@ liveOffsetとバッファの長さを渡す必要があります。
 
 2. 最も攻めた平滑済みLiveOffsetを更新します。
 
-    ```
+    ```java
     updateSmoothedMinPossibleLiveOffsetUs(liveOffsetUs, bufferedDurationUs);
     ```
 
 3. 2回目の呼び出しで前回の更新から `minUpdateIntervalMs` 以下の秒数しか経過していなければアーリーリターンします。
 
-    ```
+    ```java
     if (lastPlaybackSpeedUpdateMs != C.TIME_UNSET
         && SystemClock.elapsedRealtime() - lastPlaybackSpeedUpdateMs < minUpdateIntervalMs) {
       return adjustedPlaybackSpeed;
@@ -314,7 +314,7 @@ liveOffsetとバッファの長さを渡す必要があります。
 
 4. targetLiveOffsetを更新します。
 
-    ```
+    ```java
     lastPlaybackSpeedUpdateMs = SystemClock.elapsedRealtime();
 
     adjustTargetLiveOffsetUs(liveOffsetUs);
@@ -322,7 +322,7 @@ liveOffsetとバッファの長さを渡す必要があります。
 
 5. オフセット誤差を取り、誤差に比例定数を掛けた値を1に足して、調整後の値とします。
 
-    ```
+    ```java
     long liveOffsetErrorUs = liveOffsetUs - currentTargetLiveOffsetUs;
     if (Math.abs(liveOffsetErrorUs) < maxLiveOffsetErrorUsForUnitSpeed) {
       adjustedPlaybackSpeed = 1f;
@@ -341,7 +341,7 @@ liveOffsetとバッファの長さを渡す必要があります。
 
 currentTargetLiveOffsetが500ms増え、`lastPlaybackSpeedUpdateMs` がアンセットされます。
 
-```
+```java
   @Override
   public void notifyRebuffer() {
     if (currentTargetLiveOffsetUs == C.TIME_UNSET) {
