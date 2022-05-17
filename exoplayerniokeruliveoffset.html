@@ -53,35 +53,31 @@
 <p>採択されるアルゴリズムにも優先順位がある。</p>
 <ol>
 <li>
-<h1>EXT-X-START がある場合</h1>
-</li>
-</ol>
+<p><code>#EXT-X-START</code> がある場合</p>
 <p>マスタープレイリストまたはメディアプレイリストに記載される可能性があるタグです。<br>
-記載されたプレイリストからの相対位置または、絶対位置で定義できます（絶対位置はおそらくMasterPlaylistに記載する想定だと思われます）。  </p>
-<h1>EXT-X-ENDLISTタグがプレイリストに含まれていない場合（ライブ再生）ではTARGET DURATIONの3倍以下の値を設定すべきではないことが示されています。</h1>
+記載されたプレイリストからの相対位置または、絶対位置で定義できます（絶対位置はおそらくMasterPlaylistに記載する想定だと思われます）。<br>
+<code>#EXT-X-ENDLIST</code> タグがプレイリストに含まれていない場合（ライブ再生）ではTARGET DURATIONの3倍以下の値を設定すべきではないことが示されています。  </p>
 <p><a href="https://datatracker.ietf.org/doc/html/rfc8216#section-4.3.5.2">rfc8216#section-4.3.5.2</a>で規定されています。</p>
-<ol>
-<li>
-<h1>EXT-X-SERVER-CONTROLにPART-HOLD-BACKが設定されていて、part target durationがある場合</h1>
 </li>
-</ol>
+<li>
+<p><code>#EXT-X-SERVER-CONTROL</code> に <code>PART-HOLD-BACK</code> が設定されていて、part target durationがある場合</p>
 <p>Media Playlist限定のタグです。低遅延モードの時のプレイリストの終わりからの最小再生位置を示します。この値は最低でもPART TARGET DURATIONの2倍でなければいけません。また、PART TARGET DURATIONの3倍以上であるべきです。　　
 もし異なるレンディションが異なるPART TARGET DURATIONsを持っているならば、PART-HOLD-BACKは最低でもPART TARGET DURATIONの3倍であるべきです。</p>
 <p><a href="https://datatracker.ietf.org/doc/html/draft-pantos-hls-rfc8216bis#section-4.4.3.8">draft-pantos-hls-rfc8216bis#section-4.4.3.8</a></p>
-<p>PART TARGET DURATION</p>
+<p>PART TARGET DURATIONについて</p>
 <p><a href="https://datatracker.ietf.org/doc/html/draft-pantos-hls-rfc8216bis#section-4.4.3.7">draft-pantos-hls-rfc8216bis#section-4.4.3.7</a></p>
-<ol>
-<li>
-<h1>EXT-X-SERVER-CONTROLにHOLD-BACKが設定されている場合</h1>
 </li>
-</ol>
+<li>
+<p><code>#EXT-X-SERVER-CONTROL</code> に <code>HOLD-BACK</code> が設定されている場合</p>
 <p>Media Playlist限定のタグです。プレイリストの終わりからの最小再生位置を示します。</p>
 <p><a href="https://datatracker.ietf.org/doc/html/draft-pantos-hls-rfc8216bis#section-4.4.3.8">draft-pantos-hls-rfc8216bis#section-4.4.3.8</a></p>
-<ol>
-<li>上記の項目が該当しない時</li>
-</ol>
+</li>
+<li>
+<p>上記の項目が該当しない時</p>
 <p>TARGET DURATIONの3倍になります。</p>
 <p><a href="https://datatracker.ietf.org/doc/html/draft-pantos-hls-rfc8216bis-09#:~:text=Its%20absence%20implies%20a%20value%20of%20three%0A%20%20%20%20%20%20times%20the%20Target%20Duration.">HLS spec 4.4.3.8</a></p>
+</li>
+</ol>
 <div class="highlight"><pre><span></span><code>  <span class="cm">/**</span>
 <span class="cm">   * Gets the target live offset, in microseconds, for a live playlist.</span>
 <span class="cm">   *</span>
