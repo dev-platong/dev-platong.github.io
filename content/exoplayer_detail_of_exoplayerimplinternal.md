@@ -97,5 +97,3 @@ MediaPeriodQueueクラスのコンストラクタでPeriodとWindowを生成す�
 - TrackSelectorを初期化する。
 - RendererCapabilitiesの取得を行う。
 - スレッドを生成する。
-
-明日は低遅延周りを理解したいため、 [`LivePlaybackSpeedControl` を深追いする。]({filename}./exoplayer_live_playback_speed_control.md)
