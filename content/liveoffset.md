@@ -19,6 +19,8 @@ LiveOffsetは、現在の時刻から再生位置が何秒遅れているかを�
 
 [ExoPlayerImplInternal.java#L1114-L1115](https://github.com/google/ExoPlayer/blob/r2.17.1/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L1114-L1115)
 
+`Player.getCurrentLiveOffset()` で取得できます。 SEE: [Player.html#getCurrentLiveOffset()](https://exoplayer.dev/doc/reference/com/google/android/exoplayer2/Player.html#getCurrentLiveOffset())
+
 # LiveOffsetの決まり方
 
 ## HLSの場合
