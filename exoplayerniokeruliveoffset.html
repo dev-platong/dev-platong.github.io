@@ -43,12 +43,12 @@
 <li>ライブオフセットとは何か</li>
 <li>ライブオフセットの決まり方</li>
 </ul>
-<h1>LiveOffsetとは</h1>
+<h1><a id="liveoffset">LiveOffsetとは</a></h1>
 <p>LiveOffsetは、現在の時刻から再生位置が何秒遅れているかを示します。 FROM: <a href="https://github.com/google/ExoPlayer/blame/r2.17.1/docs/live-streaming.md#L11-L12">live-streaming.md#L11-L12</a></p>
-<p><img src="../images/getLiveOffsetUs.jpg" alt="ExoPlayerImplInternal Line 1108 getLiveOffsetUs function"/></p>
+<p><img src="../images/getLiveOffsetUs.jpg" alt="ExoPlayerImplInternal Line 1108 getLiveOffsetUs function" id="figure_live_offset"/></p>
 <p><a href="https://github.com/google/ExoPlayer/blob/r2.17.1/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L1114-L1115">ExoPlayerImplInternal.java#L1114-L1115</a></p>
 <p><code>Player.getCurrentLiveOffset()</code> で取得できます。 SEE: <a href="https://exoplayer.dev/doc/reference/com/google/android/exoplayer2/Player.html#getCurrentLiveOffset()">Player.html#getCurrentLiveOffset()</a></p>
-<h1>LiveOffsetの決まり方</h1>
+<h1><a id="how_to_determine">LiveOffsetの決まり方</a></h1>
 <h2>HLSの場合</h2>
 <p>採択されるアルゴリズムにも優先順位がある。</p>
 <ol>
@@ -151,7 +151,7 @@
 
 <p>https://github.com/google/ExoPlayer/blob/r2.17.1/library/hls/src/main/java/com/google/android/exoplayer2/source/hls/playlist/HlsMediaPlaylist.java#L570-L573</p>
 <p>そして最終的にLiveEdgeが算出されます。お疲れ様でした。</p>
-<p><img src="./images/getLiveEdgeOffsetUs.jpg" alt="LiveEdgeOffset figure"/></p>
+<p><img src="./images/getLiveEdgeOffsetUs.jpg" alt="LiveEdgeOffset figure" id="figure_live_edge"/></p>
 <div class="highlight"><pre><span></span><code>  <span class="kd">private</span> <span class="kt">long</span> <span class="nf">getLiveEdgeOffsetUs</span><span class="p">(</span><span class="n">HlsMediaPlaylist</span> <span class="n">playlist</span><span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> <span class="n">playlist</span><span class="p">.</span><span class="na">hasProgramDateTime</span>
         <span class="o">?</span> <span class="n">Util</span><span class="p">.</span><span class="na">msToUs</span><span class="p">(</span><span class="n">Util</span><span class="p">.</span><span class="na">getNowUnixTimeMs</span><span class="p">(</span><span class="n">elapsedRealTimeOffsetMs</span><span class="p">))</span> <span class="o">-</span> <span class="n">playlist</span><span class="p">.</span><span class="na">getEndTimeUs</span><span class="p">()</span>

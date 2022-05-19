@@ -1059,12 +1059,12 @@ the renderer is ready for playback to be started. Returning false indicates that
 &lt;li&gt;ライブオフセットとは何か&lt;/li&gt;
 &lt;li&gt;ライブオフセットの決まり方&lt;/li&gt;
 &lt;/ul&gt;
-&lt;h1&gt;LiveOffsetとは&lt;/h1&gt;
+&lt;h1&gt;&lt;a id="liveoffset"&gt;LiveOffsetとは&lt;/a&gt;&lt;/h1&gt;
 &lt;p&gt;LiveOffsetは、現在の時刻から再生位置が何秒遅れているかを示します。 FROM: &lt;a href="https://github.com/google/ExoPlayer/blame/r2.17.1/docs/live-streaming.md#L11-L12"&gt;live-streaming.md#L11-L12&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;&lt;img src="../images/getLiveOffsetUs.jpg" alt="ExoPlayerImplInternal Line 1108 getLiveOffsetUs function"/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="../images/getLiveOffsetUs.jpg" alt="ExoPlayerImplInternal Line 1108 getLiveOffsetUs function" id="figure_live_offset"/&gt;&lt;/p&gt;
 &lt;p&gt;&lt;a href="https://github.com/google/ExoPlayer/blob/r2.17.1/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L1114-L1115"&gt;ExoPlayerImplInternal.java#L1114-L1115&lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;&lt;code&gt;Player.getCurrentLiveOffset()&lt;/code&gt; で取得できます。 SEE: &lt;a href="https://exoplayer.dev/doc/reference/com/google/android/exoplayer2/Player.html#getCurrentLiveOffset()"&gt;Player.html#getCurrentLiveOffset()&lt;/a&gt;&lt;/p&gt;
-&lt;h1&gt;LiveOffsetの決まり方&lt;/h1&gt;
+&lt;h1&gt;&lt;a id="how_to_determine"&gt;LiveOffsetの決まり方&lt;/a&gt;&lt;/h1&gt;
 &lt;h2&gt;HLSの場合&lt;/h2&gt;
 &lt;p&gt;採択されるアルゴリズムにも優先順位がある。&lt;/p&gt;
 &lt;ol&gt;
@@ -1167,7 +1167,7 @@ the renderer is ready for playback to be started. Returning false indicates that
 
 &lt;p&gt;https://github.com/google/ExoPlayer/blob/r2.17.1/library/hls/src/main/java/com/google/android/exoplayer2/source/hls/playlist/HlsMediaPlaylist.java#L570-L573&lt;/p&gt;
 &lt;p&gt;そして最終的にLiveEdgeが算出されます。お疲れ様でした。&lt;/p&gt;
-&lt;p&gt;&lt;img src="./images/getLiveEdgeOffsetUs.jpg" alt="LiveEdgeOffset figure"/&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src="./images/getLiveEdgeOffsetUs.jpg" alt="LiveEdgeOffset figure" id="figure_live_edge"/&gt;&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;  &lt;span class="kd"&gt;private&lt;/span&gt; &lt;span class="kt"&gt;long&lt;/span&gt; &lt;span class="nf"&gt;getLiveEdgeOffsetUs&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;HlsMediaPlaylist&lt;/span&gt; &lt;span class="n"&gt;playlist&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
     &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="n"&gt;playlist&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;hasProgramDateTime&lt;/span&gt;
         &lt;span class="o"&gt;?&lt;/span&gt; &lt;span class="n"&gt;Util&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;msToUs&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;Util&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;getNowUnixTimeMs&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;elapsedRealTimeOffsetMs&lt;/span&gt;&lt;span class="p"&gt;))&lt;/span&gt; &lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;playlist&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="na"&gt;getEndTimeUs&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
