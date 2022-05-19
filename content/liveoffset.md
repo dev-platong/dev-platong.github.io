@@ -11,17 +11,17 @@ Authors: dev-platong
 - ライブオフセットとは何か
 - ライブオフセットの決まり方
 
-# LiveOffsetとは
+# <a id="liveoffset">LiveOffsetとは</a>
 
 LiveOffsetは、現在の時刻から再生位置が何秒遅れているかを示します。 FROM: [live-streaming.md#L11-L12](https://github.com/google/ExoPlayer/blame/r2.17.1/docs/live-streaming.md#L11-L12)
 
-<img src="../images/getLiveOffsetUs.jpg" alt="ExoPlayerImplInternal Line 1108 getLiveOffsetUs function"/>
+<img src="../images/getLiveOffsetUs.jpg" alt="ExoPlayerImplInternal Line 1108 getLiveOffsetUs function" id="figure_live_offset"/>
 
 [ExoPlayerImplInternal.java#L1114-L1115](https://github.com/google/ExoPlayer/blob/r2.17.1/library/core/src/main/java/com/google/android/exoplayer2/ExoPlayerImplInternal.java#L1114-L1115)
 
 `Player.getCurrentLiveOffset()` で取得できます。 SEE: [Player.html#getCurrentLiveOffset()](https://exoplayer.dev/doc/reference/com/google/android/exoplayer2/Player.html#getCurrentLiveOffset())
 
-# LiveOffsetの決まり方
+# <a id="how_to_determine">LiveOffsetの決まり方</a>
 
 ## HLSの場合
 
@@ -143,7 +143,7 @@ https://github.com/google/ExoPlayer/blob/r2.17.1/library/hls/src/main/java/com/g
 
 そして最終的にLiveEdgeが算出されます。お疲れ様でした。
 
-<img src="./images/getLiveEdgeOffsetUs.jpg" alt="LiveEdgeOffset figure"/>
+<img src="./images/getLiveEdgeOffsetUs.jpg" alt="LiveEdgeOffset figure" id="figure_live_edge"/>
 
 ```java
   private long getLiveEdgeOffsetUs(HlsMediaPlaylist playlist) {
